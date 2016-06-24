@@ -1,4 +1,4 @@
-package de.dkt.eservices.eparrotld;
+package de.dkt.eservices.eparrotrepository;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,7 +37,6 @@ import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
 import eu.freme.common.exception.BadRequestException;
 import eu.freme.common.rest.NIFParameterSet;
 
-@RestController
 public class ParrotLDService extends eu.freme.common.rest.BaseRestController{
 
 	Logger logger = Logger.getLogger(ParrotLDService.class);

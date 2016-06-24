@@ -243,22 +243,22 @@ public class EParrotLDTest {
 		return Unirest.post(url);
 	}
 	
-	@Test
-	public void testEParrotLDBasic() throws UnirestException, IOException,
-			Exception {
-
-				HttpResponse<String> response = baseRequest()
-				.queryString("informat", "text")
-				.queryString("input", "hello world")
-				.queryString("outformat", "turtle").asString();
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-
-		while(true){
-			Thread.sleep(5000);
-		}
-		
-	}
+//	@Test
+//	public void testEParrotLDBasic() throws UnirestException, IOException,
+//			Exception {
+//
+//				HttpResponse<String> response = baseRequest()
+//				.queryString("informat", "text")
+//				.queryString("input", "hello world")
+//				.queryString("outformat", "turtle").asString();
+//		assertTrue(response.getStatus() == 200);
+//		assertTrue(response.getBody().length() > 0);
+//
+//		while(true){
+//			Thread.sleep(5000);
+//		}
+//		
+//	}
 	
 //	@Test
 //	public void testETimeliningProcessDocument() throws UnirestException, IOException,Exception {

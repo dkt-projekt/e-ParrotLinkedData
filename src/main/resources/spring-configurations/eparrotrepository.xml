@@ -7,14 +7,24 @@
 	http://www.springframework.org/schema/context
 	http://www.springframework.org/schema/context/spring-context.xsd">
 
-	<import resource="classpath:spring-configurations/edocumentstorage.xml" />
+<!--	<import resource="classpath:spring-configurations/edocumentstorage.xml" />
 	<import resource="classpath:spring-configurations/elucene.xml" />
 	<import resource="classpath:spring-configurations/esesame.xml" />
 	<import resource="classpath:spring-configurations/eopennlp.xml" />
 	<import resource="classpath:spring-configurations/eweka.xml" />
-<!-- 	<import resource="classpath:spring-configurations/ecorenlp.xml" />
+ 	<import resource="classpath:spring-configurations/ecorenlp.xml" />
 	<import resource="classpath:spring-configurations/emallet.xml" />
 	<import resource="classpath:spring-configurations/esmt.xml" />-->
 
-	<context:component-scan base-package="de.dkt.eservices.eparrotld" />
+	<context:component-scan base-package="de.dkt.eservices.eparrotrepository" />
+	
+	    
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://dev.digitale-kuratierung.de:3306/dkt-db" />
+		<property name="username" value="dkt-db" />
+		<property name="password" value="tZWz:{*L'KpH" />
+	</bean>
+	
 </beans>

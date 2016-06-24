@@ -8,9 +8,10 @@
 	http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<import resource="classpath:spring-configurations/freme-common.xml" />
-	<import resource="classpath:spring-configurations/test-helper.xml" />
-	<import resource="classpath:spring-configurations/eparrotld.xml" />
+<!--  	<import resource="classpath:spring-configurations/users.xml" />
+	<import resource="classpath:spring-configurations/cors-filter.xml" />
+	<import resource="classpath:spring-configurations/logging.xml" />
+	 -->
+	<import resource="classpath:spring-configurations/eparrotrepository.xml" />
 	
 </beans>
-
-

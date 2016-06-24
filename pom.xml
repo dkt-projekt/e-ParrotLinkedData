@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkt</groupId>
   <artifactId>e-ParrotLinkedData</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>e-ParrotLinkedData</name>
   <description>DKT project</description>
   
@@ -23,53 +23,23 @@
   	<dependency>
   		<groupId>eu.freme.bservices</groupId>
   		<artifactId>test-helper</artifactId>
-  		<version>0.1-SNAPSHOT</version>
+  		<version>0.2-SNAPSHOT</version>
   	</dependency>
 		<dependency>
 			<groupId>de.dkt</groupId>
-			<artifactId>DKTCommonUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>DKTCommon</artifactId>
+			<version>0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>DocumentStorageUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>net.minidev</groupId>
+			<artifactId>json-smart</artifactId>
+			<version>1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-luceneUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.10.4</version>
 		</dependency>
-		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-SesameUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-WekaUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-openNLPUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>		
-		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-coreNLPUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>		
-<!-- 		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-MalletUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>		
-		<dependency>
-			<groupId>de.dkt</groupId>
-			<artifactId>e-SMTUpdate</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>-->		
   </dependencies>	
 	<repositories>
 		<repository>
