@@ -149,12 +149,19 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 
 	@Override
 	public List<Document> listDocumentsFromCollectionByName(String collectionName) {
-		String SQL = "select * from Documents";
-		if(collectionName!=null){
-			SQL += " where ";
-			SQL += "collectionName='"+collectionName+"' ";
+		String SQL = "select * from Collections where collectionName = ?";
+		List<Collection> col = jdbcTemplateObject.query(SQL, new Object[]{collectionName}, new CollectionMapper());
+		if(col.isEmpty()){
+			return null;
 		}
-		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
+		int colId = col.get(0).getCollectionId();
+
+		String SQL2 = "select * from Documents";
+		if(collectionName!=null){
+			SQL2 += " where ";
+			SQL2 += "collectionId='"+colId+"' ";
+		}
+		List <Document> docs = jdbcTemplateObject.query(SQL2, new DocumentMapper());
 		return docs;
 	}
 

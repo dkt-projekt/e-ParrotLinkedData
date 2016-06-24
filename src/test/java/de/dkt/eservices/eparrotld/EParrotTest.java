@@ -59,17 +59,17 @@ public class EParrotTest {
 		assertTrue(response.getStatus() == 200);
 		assertTrue(response.getBody().length() > 0);
 	}
-	
-	@Test
-	public void test2_1_listUsers() throws UnirestException, IOException,
-			Exception {
-				HttpResponse<String> response = request("listUsers/")
-						.asString();
-		assertTrue(response.getStatus() == 200);
-		assertTrue(response.getBody().length() > 0);
-		String expectedOutput = "{\"users\":{\"user1\":{\"password\":\"*3A9588B01510694D53D532A8B2885A00D89F0F5D\",\"name\":\"julian\",\"id\":1,\"email\":\"jmschnei@gmail.com\"},\"user2\":{\"password\":\"*C87302C99F650EFB1654068B217EFE5E69DA6271\",\"name\":\"julian 3\",\"id\":2,\"email\":\"jmschnei3\"}}}";
-		Assert.assertEquals(expectedOutput, response.getBody());
-	}
+//	
+//	@Test
+//	public void test2_1_listUsers() throws UnirestException, IOException,
+//			Exception {
+//				HttpResponse<String> response = request("listUsers/")
+//						.asString();
+//		assertTrue(response.getStatus() == 200);
+//		assertTrue(response.getBody().length() > 0);
+//		String expectedOutput = "{\"users\":{\"user1\":{\"password\":\"*3A9588B01510694D53D532A8B2885A00D89F0F5D\",\"name\":\"julian\",\"id\":1,\"email\":\"jmschnei@gmail.com\"},\"user2\":{\"password\":\"*C87302C99F650EFB1654068B217EFE5E69DA6271\",\"name\":\"julian 3\",\"id\":2,\"email\":\"jmschnei3\"}}}";
+//		Assert.assertEquals(expectedOutput, response.getBody());
+//	}
 
 	@Test
 	public void test3_1_CreateUser_1() throws UnirestException, IOException,Exception {
@@ -166,20 +166,20 @@ public class EParrotTest {
 						.queryString("informat", "text")
 						.asString();
 		assertTrue(response.getStatus() == 200);
-		Assert.assertEquals("{\"users\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response.getBody());
+		Assert.assertEquals("{\"users\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response.getBody());
 
 			HttpResponse<String> response2 = request("listCollections/")
 					.queryString("user", "jmschnei")
 					.asString();
 		assertTrue(response.getStatus() == 200);
-		Assert.assertEquals("{\"users\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response.getBody());
+		Assert.assertEquals("{\"users\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response.getBody());
 	}
 	
 	@Test
 	public void test4_3_collectionOverview() throws UnirestException, IOException,Exception {
 				HttpResponse<String> response = request("collection1/overview").asString();
 		assertTrue(response.getStatus() == 200);
-		Assert.assertEquals("{\"entitylinking\":\"\",\"private\":false,\"description\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}", response.getBody());
+		Assert.assertEquals("{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}", response.getBody());
 		
 	}
 	
