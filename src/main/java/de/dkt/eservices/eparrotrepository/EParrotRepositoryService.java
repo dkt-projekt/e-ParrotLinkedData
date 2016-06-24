@@ -152,12 +152,12 @@ public class EParrotRepositoryService {
 			else if(o instanceof Collection){
 				System.out.println("-------is collection:");
 				Collection c = (Collection) o;
-				joUsers.put("collection"+(i+1), c.getJSONObject());
+				joCollections.put("collection"+(i+1), c.getJSONObject());
 			}
 			else if(o instanceof Document){
 				System.out.println("-------is document:");
 				Document d = (Document) o;
-				joUsers.put("document"+(i+1), d.getJSONObject());
+				joDocuments.put("document"+(i+1), d.getJSONObject());
 			}
 			else{
 				System.out.println("ERROR: element type not supported.");
