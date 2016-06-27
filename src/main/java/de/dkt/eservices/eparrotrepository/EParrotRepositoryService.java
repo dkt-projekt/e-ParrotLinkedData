@@ -182,17 +182,6 @@ public class EParrotRepositoryService {
 	}
 	
 	public int createCollection(String collectionId, String description, String user, boolean priv, String analysis, String sUsers) throws ExternalServiceFailedException {
-		
-		//TODO Do all the processing of the documents or at least start it.
-		
-		
-		
-
-		
-		
-		
-		
-		
 		return databaseService.storeCollection(collectionId, user, description, priv, analysis, sUsers);
 	}
 	
@@ -279,6 +268,7 @@ public class EParrotRepositoryService {
 		}
 
 		String annotatedContent = aContent;
+		content = aContent;
 //		System.out.println("Annotated1: " + annotatedContent);
 		String [] analysisParts = analysis.split(",");
 
@@ -323,7 +313,7 @@ public class EParrotRepositoryService {
 
 		String highlightedContent = highlighText(annotatedContent);
 		
-//		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
+		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
 //		System.out.println("Annotated2: " + annotatedContent);
 //		System.out.println("Highlighted: " + highlightedContent);
 
@@ -347,6 +337,11 @@ public class EParrotRepositoryService {
 		String clustering = doCollectionSemanticExploration(collectionName,docsList);
 		String documents = doCollectionDocumentsList(collectionName,docsList);
 
+		System.out.println("TIMELINING: " + timelining);
+		System.out.println("GEO: " + geolocalization);
+		System.out.println("Semantic: " + semanticexploration);
+		System.out.println("Clustering: " + clustering);
+		System.out.println("DOCUMENTS: " + documents);
 		return databaseService.updateCollection(collectionName, timelining,geolocalization,semanticexploration,clustering,documents);
 	}
 
@@ -397,6 +392,7 @@ public class EParrotRepositoryService {
 			return output;
 		}
 		catch(Exception e){
+			e.printStackTrace();
 			String msg = "Error at generating timelinig for collection: "+collectionName;
 			logger.error(msg);
 			return "";
@@ -428,14 +424,13 @@ public class EParrotRepositoryService {
 			return output;
 		}
 		catch(Exception e){
-			String msg = "Error at generating timelinig for collection: "+collectionName;
+			String msg = "Error at generating geolocalization for collection: "+collectionName;
 			logger.error(msg);
 			return "";
 		}	}
 
 	public String doCollectionSemanticExploration(String collectionName, List<Document> docsList){
 		//TODO
-		
 		String output = "";
 		
 		/*
@@ -696,4 +691,13 @@ public class EParrotRepositoryService {
 		return databaseService.existsUser(user);
 	}
 	
+	public void deleteDocumentByName(String documentName) {
+       	databaseService.deleteDocumentByName(documentName);
+       	return;
+	}
+
+	public void deleteDocumentById(String documentId) {
+       	databaseService.deleteDocumentByName(documentId);
+       	return;
+	}
 }

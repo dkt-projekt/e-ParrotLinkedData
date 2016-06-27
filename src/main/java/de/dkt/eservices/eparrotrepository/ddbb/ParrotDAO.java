@@ -50,4 +50,8 @@ public interface ParrotDAO {
 	public void delete(Integer id);
 
 	public void update(Integer id, String type, String additionalInformation);
+	
+	public void deleteDocumentByName(String documentName);
+
+	public void deleteDocumentById(String documentId);
 }

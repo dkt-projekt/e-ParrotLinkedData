@@ -165,13 +165,13 @@ public class EParrotTest {
 				.queryString("informat", "text")
 				.asString();
 		assertTrue(response.getStatus() == 200);
-		Assert.assertEquals("{\"collections\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response.getBody());
+		Assert.assertEquals("{\"collections\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection2\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection3\"}}}", response.getBody());
 
 		HttpResponse<String> response2 = request("listCollections/")
 				.queryString("user", "jmschnei@gmail.com")
 				.asString();
 		assertTrue(response2.getStatus() == 200);
-		Assert.assertEquals("{\"collections\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"}}}", response2.getBody());
+		Assert.assertEquals("{\"collections\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection2\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection3\"}}}", response2.getBody());
 
 		HttpResponse<String> response3 = request("listCollections/")
 				.queryString("user", "jmschnei@gmail.com")
@@ -217,6 +217,62 @@ public class EParrotTest {
 		assertTrue(response.getStatus() == 200);
 		Assert.assertTrue(response.getBody().contains("successfully"));
 
+		response = request("collection1/addDocument")
+				.queryString("documentName", "document1Turtle")
+				.queryString("documentDescription", "This is the description of the document 1 (Turtle) of collection 1")
+				.queryString("user", "jmschnei@gmail.com")
+				.queryString("format", "")
+				.queryString("informat", "turtle")
+				.queryString("input", TestConstants.doc1TurtleContent)
+//				.queryString("path", "")
+				.queryString("analysis", "ner_LOC_en")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertTrue(response.getBody().contains("successfully"));
+
+		response = request("collection1/addDocument")
+				.queryString("documentName", "document1Turtle")
+				.queryString("documentDescription", "This is the description of the document 1 (Turtle) of collection 1")
+				.queryString("user", "jmschnei")
+				.queryString("format", "")
+				.queryString("informat", "turtle")
+				.queryString("input", TestConstants.doc1TurtleContent)
+//				.queryString("path", "")
+				.queryString("analysis", "ner_LOC_en")
+				.asString();
+		assertTrue(response.getStatus() == 502);
+		System.out.println("BODY: "+response.getBody());
+		Assert.assertTrue(response.getBody().contains("has not rights for accessing the collection"));
+	}
+
+//	@Test
+//	public void test5_2_DeleteDocument() throws UnirestException, IOException,Exception {
+//		HttpResponse<String> response = request("collection1/deleteDocument")
+//				.queryString("documentName", "document1Plaintext")
+//				.queryString("user", "jmschnei@gmail.com")
+//				.asString();
+//		assertTrue(response.getStatus() == 200);
+//		System.out.println("BODY: "+ response.getBody());
+////		Assert.assertTrue(response.getBody().contains("successfully"));
+//
+//		response = request("collection1/deleteDocument")
+//				.queryString("documentName", "document1Turtle")
+//				.queryString("user", "jmschnei@gmail.com")
+//				.asString();
+//		assertTrue(response.getStatus() == 200);
+//		System.out.println("BODY: "+ response.getBody());
+////		Assert.assertTrue(response.getBody().contains("successfully"));
+//
+//	}
+	
+	@Test
+	public void test5_3_ListDocuments() throws UnirestException, IOException,Exception {
+		HttpResponse<String> response = request("collection1/listDocuments")
+				.queryString("user", "jmschnei@gmail.com")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertEquals("{}",response.getBody());
+
 //		response = request("collection1/addDocument")
 //				.queryString("documentName", "document1Turtle")
 //				.queryString("documentDescription", "This is the description of the document 1 (Turtle) of collection 1")
@@ -231,7 +287,6 @@ public class EParrotTest {
 //		Assert.assertTrue(response.getBody().contains("successfully"));
 
 	}
-
 
 //	@Test
 //	public void testETimeliningProcessDocument() throws UnirestException, IOException,Exception {

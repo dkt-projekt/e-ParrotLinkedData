@@ -114,14 +114,14 @@ public class ParrotDatabaseService {
     	}
 	}
 
-	public List<Document> listDocument(String collectionId,String user) throws ExternalServiceFailedException {
+	public List<Document> listDocument(String collectionId,String userName) throws ExternalServiceFailedException {
         try {
-        	if(user==null){
+        	if(userName==null){
             	List<Document> list = parrotDAO.listDocumentsFromCollection(collectionId);
             	return list;
         	}
         	else{
-            	List<Document> list = parrotDAO.listDocumentsFromUser(user, collectionId);
+            	List<Document> list = parrotDAO.listDocumentsFromUser(userName, collectionId);
             	return list;
         	}
     	} catch (Exception e) {
@@ -131,14 +131,14 @@ public class ParrotDatabaseService {
     	}
 	}
 
-	public List<Document> listDocumentByName(String collectionName,String user) throws ExternalServiceFailedException {
+	public List<Document> listDocumentByName(String collectionName,String userName) throws ExternalServiceFailedException {
         try {
-        	if(user==null){
+        	if(userName==null){
             	List<Document> list = parrotDAO.listDocumentsFromCollectionByName(collectionName);
             	return list;
         	}
         	else{
-            	List<Document> list = parrotDAO.listDocumentsFromUserByName(user, collectionName);
+            	List<Document> list = parrotDAO.listDocumentsFromUserByName(userName, collectionName);
             	return list;
         	}
     	} catch (Exception e) {
@@ -175,4 +175,15 @@ public class ParrotDatabaseService {
 	public boolean updateCollection(String collectionName, String timelining, String geolocalization, String semanticexploration,String clustering, String documents) {
 		return parrotDAO.updateCollection(collectionName, timelining, geolocalization, semanticexploration,clustering, documents);
 	}
+
+	public void deleteDocumentByName(String documentName) {
+       	parrotDAO.deleteDocumentByName(documentName);
+       	return;
+	}
+
+	public void deleteDocumentById(String documentId) {
+       	parrotDAO.deleteDocumentByName(documentId);
+       	return;
+	}
+
 }

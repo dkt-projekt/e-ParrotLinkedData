@@ -302,11 +302,11 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 	public ResponseEntity<String> listDocumentsFromCollection(
 			HttpServletRequest request, 
 			@PathVariable(value = "collection") String collectionName,
-			@RequestParam(value = "user", required = false) String user,
+			@RequestParam(value = "user", required = false) String userName,
 			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			String result = repositoryService.listDocuments(collectionName, user, limit);
+			String result = repositoryService.listDocuments(collectionName, userName, limit);
 
 			HttpHeaders responseHeaders = new HttpHeaders();
 //			responseHeaders.add("Content-Type", RDFSerialization.JSON.name());
@@ -407,6 +407,45 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 		}
 	}	
 	
+	@RequestMapping(value = "/e-parrot/{collection}/deleteDocument", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> deleteDocumentFromCollection(
+			HttpServletRequest request, 
+			@RequestHeader(value = "Accept", required = false) String acceptHeader,
+			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
+
+			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "documentName", required = false) String documentName,
+			@RequestParam(value = "documentId", required = false) String documentId,
+			@RequestParam(value = "user", required = false) String user,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			//TODO Check permissions of user.
+			//if(){
+			//	
+			//}
+			String identifier = null;
+			if(documentId!=null){
+				repositoryService.deleteDocumentById(documentId);
+				identifier = documentId;
+			}
+			else if(documentName!=null){
+				repositoryService.deleteDocumentByName(documentName);
+				identifier = documentName;
+			}
+			else{
+            	logger.error("No document identifier provided.");
+                throw new BadRequestException("No document identifier provided.");
+			}
+			String result = "The document "+identifier+" has been succesfully deleted.";
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
+
+
 //	@RequestMapping(value = "/e-parrot/repository/addDocumentFromString", method = { RequestMethod.POST, RequestMethod.GET })
 //	public ResponseEntity<String> addDocumentToTimelining(
 //			HttpServletRequest request, 

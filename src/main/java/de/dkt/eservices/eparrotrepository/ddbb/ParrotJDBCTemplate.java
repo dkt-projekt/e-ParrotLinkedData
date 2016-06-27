@@ -59,13 +59,14 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 
 
 	public boolean updateCollection(String collectionName, String timelining, String geolocalization,String semanticexploration, String clustering, String documents) {
-		String SQL = "update Collections SET timelining='?', geolocalization='?', entitylinking='?', clustering='?', documents='?' "
+		String SQL = "update Collections SET timelining='"+timelining+"', geolocalization='"+geolocalization+"', entitylinking='"+semanticexploration+"',"
+				+ " clustering='"+clustering+"', documents='"+documents+"' "
 				+ " WHERE collectionName='"+collectionName+"'";
 		try{
-			jdbcTemplateObject.update( SQL, timelining, geolocalization, semanticexploration, clustering, documents);
+			jdbcTemplateObject.update( SQL );
 		}
 		catch(Exception e){
-	//		System.out.println("ERROR at updating collection!");
+			e.printStackTrace();
 			return false;
 		}
 		return true;
@@ -77,7 +78,7 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		int userId = jdbcTemplateObject.queryForObject(SQL0, new IntegerMapper());
 		String SQL1 = "select collectionId id from Collections WHERE collectionName='"+collection+"'";
 		int collectionId = jdbcTemplateObject.queryForObject(SQL1, new IntegerMapper());
-		String SQL = "insert into Documents (documentId, collectionId, userId, documentName, description, analysis, content, annotateContent, highlightedContent) "
+		String SQL = "insert into Documents (documentId, collectionId, userId, documentName, description, analysis, content, annotatedContent, highlightedContent) "
 				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?)";
 		jdbcTemplateObject.update( SQL, collectionId, userId, documentName, description, analysis, content, annotatedContent, highlightedContent);
 		String SQL2 = "select MAX(documentId) id from Documents";
@@ -177,10 +178,13 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		if(user==null){
 			return null;
 		}
-		String SQL = "select * from Documents,Collections where Documents.collectionId=Collections.collectionId AND Collections.user = '"+user+"' ";
+		String SQL0 = "select userId id from Users WHERE user='"+user+"'";
+		List<Integer> users = jdbcTemplateObject.query(SQL0, new IntegerMapper());
+		String SQL = "select d.documentId, d.collectionId, d.userId, d.documentName, d.description, d.analysis, d.content, d.annotatedContent, d.highlightedContent "
+				+ "from Documents d,Collections where d.collectionId=Collections.collectionId AND Collections.userId = '"+users.get(0)+"' ";
 		if(collectionId!=null){
 			SQL += " AND ";
-			SQL += "collectionId='"+collectionId+"' ";
+			SQL += "Collections.collectionId='"+collectionId+"' ";
 		}
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
 		return docs;
@@ -191,10 +195,13 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		if(user==null){
 			return null;
 		}
-		String SQL = "select * from Documents,Collections where Documents.collectionId=Collections.collectionId AND Collections.user = '"+user+"' ";
+		String SQL0 = "select userId id from Users WHERE user='"+user+"'";
+		List<Integer> users = jdbcTemplateObject.query(SQL0, new IntegerMapper());
+		String SQL = "select d.documentId, d.collectionId, d.userId, d.documentName, d.description, d.analysis, d.content, d.annotatedContent, d.highlightedContent "
+				+ "from Documents d,Collections where d.collectionId=Collections.collectionId AND Collections.userId = '"+users.get(0)+"' ";
 		if(collectionName!=null){
 			SQL += " AND ";
-			SQL += "collectionName='"+collectionName+"' ";
+			SQL += "Collections.collectionName='"+collectionName+"' ";
 		}
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
 		return docs;
@@ -257,4 +264,17 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		return true;
 	}
 
+	@Override
+	public void deleteDocumentByName(String documentName) {
+		String SQL = "delete from Documents where documentName = ?";
+		jdbcTemplateObject.update(SQL, documentName);
+		return;		
+	}
+
+	@Override
+	public void deleteDocumentById(String documentId) {
+		String SQL = "delete from Documents where documentId = ?";
+		jdbcTemplateObject.update(SQL, documentId);
+		return;		
+	}
 }

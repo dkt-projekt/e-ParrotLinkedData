@@ -19,6 +19,7 @@ public class CollectionMapper implements RowMapper<Collection> {
 		      col.setGeolocation(rs.getString("geolocalization"));
 		      col.setEntitylinking(rs.getString("entitylinking"));
 		      col.setClustering(rs.getString("clustering"));
+		      col.setDocuments(rs.getString("documents"));
 		      
 		      int priv = rs.getInt("private");
 		      if(priv==100){
