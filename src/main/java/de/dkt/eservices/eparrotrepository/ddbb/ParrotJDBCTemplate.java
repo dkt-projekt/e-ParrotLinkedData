@@ -186,7 +186,11 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			SQL += " AND ";
 			SQL += "Collections.collectionId='"+collectionId+"' ";
 		}
+		System.out.println(SQL);
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
+		System.out.println();
+		System.out.println(docs.size());
+		System.out.println();
 		return docs;
 	}
 

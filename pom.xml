@@ -13,7 +13,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	
- <parent>
+ <parent> 
     <groupId>eu.freme.e-services</groupId>
     <artifactId>e-service-parent</artifactId>
     <version>0.1-SNAPSHOT</version>

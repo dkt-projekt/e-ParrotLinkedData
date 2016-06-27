@@ -181,12 +181,12 @@ public class EParrotRepositoryService {
 		return databaseService.storeUser(newUser, newPassword, newUserName, newUserRole, user, password);
 	}
 	
-	public int createCollection(String collectionId, String description, String user, boolean priv, String analysis, String sUsers) throws ExternalServiceFailedException {
-		return databaseService.storeCollection(collectionId, user, description, priv, analysis, sUsers);
+	public int createCollection(String collectionName, String description, String user, boolean priv, String analysis, String sUsers) throws ExternalServiceFailedException {
+		return databaseService.storeCollection(collectionName, user, description, priv, analysis, sUsers);
 	}
 	
-	public String listDocuments(String collectionId,String user,int limit){
-		return listDocumentsJSON(collectionId, user, limit).toString();
+	public String listDocuments(String collectionName,String user,int limit){
+		return listDocumentsJSON(collectionName, user, limit).toString();
 	}
 	
 	public JSONObject listDocumentsJSON(String collectionId,String user,int limit){
