@@ -142,20 +142,20 @@ public class EParrotRepositoryService {
 		JSONObject joDocuments= new JSONObject();
 		JSONObject joUsers= new JSONObject();
 		int i=0;
-		System.out.println(list.size());
+//		System.out.println(list.size());
 		for (Object o: list) {
 			if(o instanceof User){
-				System.out.println("-------is user:");
+//				System.out.println("-------is user:");
 				User u = (User) o;
 				joUsers.put("user"+(i+1), u.getJSONObject());
 			}
 			else if(o instanceof Collection){
-				System.out.println("-------is collection:");
+//				System.out.println("-------is collection:");
 				Collection c = (Collection) o;
 				joCollections.put("collection"+(i+1), c.getJSONObject());
 			}
 			else if(o instanceof Document){
-				System.out.println("-------is document:");
+//				System.out.println("-------is document:");
 				Document d = (Document) o;
 				joDocuments.put("document"+(i+1), d.getJSONObject());
 			}

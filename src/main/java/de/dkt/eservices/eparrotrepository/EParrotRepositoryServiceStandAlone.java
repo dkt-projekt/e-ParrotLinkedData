@@ -1,8 +1,12 @@
 package de.dkt.eservices.eparrotrepository;
 
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,7 @@ import eu.freme.common.conversion.rdf.RDFConversionService;
 import eu.freme.common.exception.BadRequestException;
 import eu.freme.common.rest.BaseRestController;
 import eu.freme.common.rest.NIFParameterSet;
+import scala.collection.parallel.ParIterableLike.Foreach;
 
 @RestController
 public class EParrotRepositoryServiceStandAlone extends BaseRestController{
@@ -133,11 +138,11 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@RequestParam(value = "p", required = false) String p,
+
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
-
-			@RequestHeader(value = "limit", required = false, defaultValue="0") int limit,
-
 			@RequestBody(required = false) String postBody) throws Exception {
 
 		try {
@@ -171,14 +176,43 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-			@RequestHeader(value = "user", required = false) String user,
-			@RequestHeader(value = "limit", required = false, defaultValue="0") int limit,
+			@RequestParam(value = "user", required = false) String user,
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+			@RequestParam(value = "collectionId", required = false) String collectionId,
 
 			@RequestBody(required = false) String postBody) throws Exception {
 
 		try {
-			String result = repositoryService.listCollections(user,limit);
+			String result=null;
+			if(collectionId==null){
+				result = repositoryService.listCollections(user,limit);
+			}
+			else{
+				JSONObject json = repositoryService.listCollectionsJSON(user, limit);
 
+			    try{
+			    	JSONObject collections = json.getJSONObject("collections");
+			    	JSONObject newCollections = new JSONObject();
+
+			    	Set<String> keys = collections.keySet();
+			    	for (String k : keys) {
+						JSONObject col = collections.getJSONObject(k);
+					    int colId=col.getInt("collectionId");
+					    if(collectionId.equalsIgnoreCase(colId+"")){
+					    	
+						    newCollections.put(k,col);
+						    
+					    }
+					}
+			    	JSONObject resultJSON = new JSONObject();
+			    	resultJSON.put("collections", newCollections);
+			    	result = resultJSON.toString();
+				}
+				catch(Exception e){
+					//e.printStackTrace();
+					result = "{}";
+				}
+			}
 			HttpHeaders responseHeaders = new HttpHeaders();
 //			responseHeaders.add("Content-Type", RDFSerialization.PLAINTEXT.name());
 			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);

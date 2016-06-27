@@ -1,5 +1,6 @@
 package de.dkt.eservices.eparrotrepository.ddbb;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -127,12 +128,18 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 
 	@Override
 	public List<Collection> listCollections(String user) {
+		List <Collection> feedbacks = new LinkedList<Collection>();
 		String SQL = "select * from Collections";
 		if(user!=null){
+			String SQL0 = "select userId id from Users WHERE user='"+user+"'";
+			List<Integer> users = jdbcTemplateObject.query(SQL0, new IntegerMapper());
+			if(users.isEmpty()){
+				return feedbacks;
+			}
 			SQL += " where ";
-			SQL += "user='"+user+"' ";
+			SQL += "userId='"+users.get(0)+"' ";
 		}
-		List <Collection> feedbacks = jdbcTemplateObject.query(SQL, new CollectionMapper());
+		feedbacks = jdbcTemplateObject.query(SQL, new CollectionMapper());
 		return feedbacks;
 	}
 
