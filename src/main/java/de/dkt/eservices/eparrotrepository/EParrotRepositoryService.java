@@ -189,8 +189,8 @@ public class EParrotRepositoryService {
 		return listDocumentsJSON(collectionName, user, limit).toString();
 	}
 	
-	public JSONObject listDocumentsJSON(String collectionId,String user,int limit){
-		List<Document> list = databaseService.listDocument(collectionId, user);
+	public JSONObject listDocumentsJSON(String collectionName,String user,int limit){
+		List<Document> list = databaseService.listDocumentByName(collectionName, user);
 		List<Document> list2 = new LinkedList<Document>();
 		if(limit>0){
 			int counter = 0;
