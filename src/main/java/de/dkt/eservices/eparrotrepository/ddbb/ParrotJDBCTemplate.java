@@ -87,6 +87,33 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	}
 	
 	@Override
+	public boolean updateDocument(String documentName, String description, String analysis, String content, String annotatedContent, String highlightedContent) {
+		if(documentName==null){
+			return false;
+		}
+		String SQL = "UPDATE Documents SET ";
+		if(description!=null){
+			SQL += "description='"+description+"', ";
+		}
+		if(analysis!=null){
+			SQL += "analysis='"+analysis+"', ";
+		}
+		if(content!=null){
+			SQL += "content='"+content+"', ";
+		}
+		if(annotatedContent!=null){
+			SQL += "annotatedContent='"+annotatedContent+"', ";
+		}
+		if(highlightedContent!=null){
+			SQL += "highlightedContent='"+highlightedContent+"', ";
+		}
+		SQL = SQL.substring(0, SQL.lastIndexOf(','));
+		SQL += " WHERE documentName='"+documentName+"'";
+		jdbcTemplateObject.update( SQL );
+		return true;
+	}
+	
+	@Override
 	public User getUser(String email) {
 		String SQL = "select * from Users where user = ?";
 		User user = jdbcTemplateObject.queryForObject(SQL, new Object[]{email}, new UserMapper());
@@ -220,23 +247,6 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		return col.getTimelining();
 	}
 
-
-	@Override
-	public void delete(Integer id) {
-		String SQL = "delete from Feedback where id = ?";
-		jdbcTemplateObject.update(SQL, id);
-//		System.out.println("Deleted Record with ID = " + id );
-		return;		
-	}
-
-	@Override
-	public void update(Integer id, String type, String additionalInformation) {
-		String SQL = "update Feedback set type = ?, additionalInformation = ? where id = ?";
-		jdbcTemplateObject.update(SQL, type, additionalInformation,id);
-//		System.out.println("Updated Record with ID = " + id );
-		return;
-	}
-
 	@Override
 	public boolean checkUser(String user, String password) {
 		String SQL0 = "select * from Users WHERE user='"+user+"' and password=PASSWORD('"+password+"')";
@@ -271,6 +281,25 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		return true;
 	}
 
+	@Override
+	public boolean checkDocumentPermission(String documentId, String documentName, String user) {
+		String SQL0 = "select documentId id from Documents,Collections,Users WHERE Documents.collectionId=Collections.collectionId AND "
+				+ "( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' )";
+		if(documentId!=null){
+			SQL0 += " AND Documents.documentId='"+documentId+"'";
+		}
+		else{
+			SQL0 += " AND Documents.documentName='"+documentName+"'";
+		}
+
+		List<Integer> lu = jdbcTemplateObject.query(SQL0, new IntegerMapper());
+//		User u = jdbcTemplateObject.queryForObject(SQL0, new UserMapper());
+		if(lu.isEmpty()){
+			return false;
+		}
+		return true;
+	}
+	
 	@Override
 	public void deleteDocumentByName(String documentName) {
 		String SQL = "delete from Documents where documentName = ?";

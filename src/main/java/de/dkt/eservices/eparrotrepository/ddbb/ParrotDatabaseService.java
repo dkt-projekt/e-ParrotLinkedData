@@ -52,6 +52,16 @@ public class ParrotDatabaseService {
     	}
     }
 
+
+	public boolean updateDocument(String documentName, String collection, String user, String description, String analysis, String content, String annotatedContent, String highlightedContent) throws ExternalServiceFailedException {
+        try {
+        	return parrotDAO.updateDocument(documentName, description, analysis, content, annotatedContent, highlightedContent);
+    	} catch (Exception e) {
+        	logger.error(e.getMessage());
+    		throw new ExternalServiceFailedException(e.getMessage());
+    	}
+    }
+	
 	public User getUser(String email) throws ExternalServiceFailedException {
         try {
         	return parrotDAO.getUser(email);
@@ -82,14 +92,17 @@ public class ParrotDatabaseService {
     	}
 	}
 	
-	public Document getDocument(String documentName) throws ExternalServiceFailedException {
-        try {
-        	return parrotDAO.getDocument(documentName);
-    	} catch (Exception e) {
-    		e.printStackTrace();
-        	logger.error(e.getMessage());
-    		throw new ExternalServiceFailedException(e.getMessage());
-    	}
+	public Document getDocument(String documentName, String user) throws ExternalServiceFailedException {
+		if(parrotDAO.checkDocumentPermission(null, documentName, user)){
+			try {
+				return parrotDAO.getDocument(documentName);
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(e.getMessage());
+				throw new ExternalServiceFailedException(e.getMessage());
+			}
+		}
+		throw new ExternalServiceFailedException("The user has not permission to read this document.");
 	}
 	
 	public List<User> listUsers() throws ExternalServiceFailedException {
@@ -172,18 +185,28 @@ public class ParrotDatabaseService {
        	return parrotDAO.checkCollectionPermission(collectionName,user);
 	}
 
+	public boolean checkDocumentPermision(String documentName, String user) {
+       	return parrotDAO.checkDocumentPermission(null,documentName,user);
+	}
+
 	public boolean updateCollection(String collectionName, String timelining, String geolocalization, String semanticexploration,String clustering, String documents) {
 		return parrotDAO.updateCollection(collectionName, timelining, geolocalization, semanticexploration,clustering, documents);
 	}
 
-	public void deleteDocumentByName(String documentName) {
-       	parrotDAO.deleteDocumentByName(documentName);
-       	return;
+	public void deleteDocumentByName(String documentName, String user) {
+		if(parrotDAO.checkDocumentPermission(null, documentName, user)){
+	       	parrotDAO.deleteDocumentByName(documentName);
+	       	return;
+		}
+		throw new ExternalServiceFailedException("The user has not permission to delete this document.");
 	}
 
-	public void deleteDocumentById(String documentId) {
-       	parrotDAO.deleteDocumentByName(documentId);
-       	return;
+	public void deleteDocumentById(String documentId,String user) {
+		if(parrotDAO.checkDocumentPermission(documentId,null, user)){
+	       	parrotDAO.deleteDocumentByName(documentId);
+	       	return;
+		}
+		throw new ExternalServiceFailedException("The user has not permission to delete this document.");
 	}
 
 }

@@ -47,28 +47,6 @@ public class EParrotRepositoryService {
 
 	@Autowired
 	ParrotDatabaseService databaseService;
-	
-	
-//	@Autowired
-//	EDocumentStorageService docStorageService;
-//	
-//	@Autowired
-//	ESesameService sesameService;
-//	
-//	@Autowired
-//	ELuceneService luceneService;
-//	
-//	@Autowired
-//	EOpenNLPService openNLPService;
-//	
-//	@Autowired
-//	EWekaService wekaService;
-//
-//	@Autowired
-//	ETimeliningService timeliningService;
-//	
-//	@Autowired
-//	RDFConversionService rdfConversion = new JenaRDFConversionService();
     
 	public String listUsers(int limit){
 		return listUsersJSON(limit).toString();
@@ -215,6 +193,54 @@ public class EParrotRepositoryService {
 	}
 
 	public int addDocumentToCollection(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
+//		boolean access = databaseService.checkCollectionPermision(collectionName, user);
+//		if(!access){
+//			String msg = "User \""+user+"\" has not rights for accessing the collection \""+collectionName+"\"";
+//			logger.error(msg);
+//			throw new ExternalServiceFailedException(msg);
+//		}
+
+		boolean access2 = databaseService.checkDocumentPermision(collectionName, user);
+		if(!access2){
+			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
+			logger.error(msg);
+			throw new ExternalServiceFailedException(msg);
+		}
+
+		content = aContent;
+		String annotatedContent= annotateDocument(aContent,analysis);
+		String highlightedContent = highlighText(annotatedContent);
+		
+		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
+//		System.out.println("Annotated2: " + annotatedContent);
+//		System.out.println("Highlighted: " + highlightedContent);
+
+		if(!updateCollection(collectionName)){
+			logger.error("The collection has not been updated!!");
+		}
+		return docId;
+	}
+
+	public boolean updateDocument(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
+		boolean access2 = databaseService.checkDocumentPermision(collectionName, user);
+		if(!access2){
+			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
+			logger.error(msg);
+			throw new ExternalServiceFailedException(msg);
+		}
+
+		content = aContent;
+		String annotatedContent= annotateDocument(aContent,analysis);
+		String highlightedContent = highlighText(annotatedContent);
+		
+		boolean doc = databaseService.updateDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
+		if(!updateCollection(collectionName)){
+			logger.error("The collection has not been updated!!");
+		}
+		return doc;
+	}
+
+	public String annotateDocument(String aContent, String analysis) {
 		HashMap<String, HashMap<String,String>> map = new HashMap<String, HashMap<String,String>>();
 		String baseUrl = "http://dev.digitale-kuratierung.de/api";
 		HashMap<String,String> mapaux = new HashMap<String,String>();
@@ -285,7 +311,6 @@ public class EParrotRepositoryService {
 		mapaux.put("mode", "all");
 		map.put("ner_PER_ORG_LOC_en_all", mapaux);
 
-
 		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
 		mapaux.put("analysis", "temp");
 		mapaux.put("language", "en");
@@ -294,18 +319,8 @@ public class EParrotRepositoryService {
 		mapaux.put("outformat", "turtle");
 		map.put("temp_en", mapaux);
 
-		boolean access = databaseService.checkCollectionPermision(collectionName, user);
-		if(!access){
-			String msg = "User \""+user+"\" has not rights for accessing the collection \""+collectionName+"\"";
-			logger.error(msg);
-			throw new ExternalServiceFailedException(msg);
-		}
-
 		String annotatedContent = aContent;
-		content = aContent;
-//		System.out.println("Annotated1: " + annotatedContent);
 		String [] analysisParts = analysis.split(",");
-
 		try{
 			Unirest.setTimeouts(10000, 10000000);
 			for (String an : analysisParts) {
@@ -344,18 +359,7 @@ public class EParrotRepositoryService {
 			logger.error(msg, e);
 			throw new ExternalServiceFailedException(msg);
 		}
-
-		String highlightedContent = highlighText(annotatedContent);
-		
-		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
-//		System.out.println("Annotated2: " + annotatedContent);
-//		System.out.println("Highlighted: " + highlightedContent);
-
-		if(!updateCollection(collectionName)){
-			logger.error("The collection has not been updated!!");
-		}
-//		return docId;
-		return 102;
+		return annotatedContent;
 	}
 
 	public boolean updateCollection(String collectionName){
@@ -708,12 +712,12 @@ public class EParrotRepositoryService {
 		return null;
 	}
 	
-	public String getDocumentOverview(String documentName, String collectionName, int limit) {
-		return getDocumentOverviewJSON(documentName, collectionName, limit).toString();
+	public String getDocumentOverview(String documentName, String collectionName, String user, int limit) {
+		return getDocumentOverviewJSON(documentName, collectionName, user, limit).toString();
 	}
 		
-	public JSONObject getDocumentOverviewJSON(String documentName, String collectionName, int limit) {
-		Document document = databaseService.getDocument(documentName);
+	public JSONObject getDocumentOverviewJSON(String documentName, String collectionName, String user, int limit) {
+		Document document = databaseService.getDocument(documentName, user);
 		return document.getJSONObject();
 	}
 
@@ -725,13 +729,23 @@ public class EParrotRepositoryService {
 		return databaseService.existsUser(user);
 	}
 	
-	public void deleteDocumentByName(String documentName) {
-       	databaseService.deleteDocumentByName(documentName);
-       	return;
+	public boolean deleteDocumentByName(String documentName, String user) {
+       	try{
+       		databaseService.deleteDocumentByName(documentName, user);
+       		return true;
+       	}
+       	catch(Exception e){
+       		return false;
+       	}
 	}
 
-	public void deleteDocumentById(String documentId) {
-       	databaseService.deleteDocumentByName(documentId);
-       	return;
+	public boolean deleteDocumentById(String documentId, String user) {
+       	try{
+       		databaseService.deleteDocumentByName(documentId, user);
+       		return true;
+       	}
+       	catch(Exception e){
+       		return false;
+       	}
 	}
 }
