@@ -123,8 +123,11 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	@Override
 	public Document getDocument(String documentName) {
 		String SQL = "select * from Documents where documentName = ?";
-		Document doc = jdbcTemplateObject.queryForObject(SQL, new Object[]{documentName}, new DocumentMapper());
-		return doc;
+		List<Document> docs = jdbcTemplateObject.query(SQL, new Object[]{documentName}, new DocumentMapper());
+		if(docs.isEmpty()){
+			return null;
+		}
+		return docs.get(0);
 	}
 
 	@Override
