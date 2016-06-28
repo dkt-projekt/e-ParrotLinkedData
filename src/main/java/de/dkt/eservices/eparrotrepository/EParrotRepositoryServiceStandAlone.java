@@ -358,6 +358,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 	            inModel = rdfConversionService.unserializeRDF(nifParameters.getInput(), nifParameters.getInformat());
 	        }
 	        
+	        
 			String result = "";
 			int documentId = repositoryService.addDocumentToCollection(collectionName, user, documentName, documentDescription, 
 					contentTypeHeader, rdfConversionService.serializeRDF(inModel, RDFSerialization.TURTLE), analysis);
