@@ -91,10 +91,10 @@ public class Document {
 		resultJSON.put("collectionId", collectionId);
 		resultJSON.put("documentName", documentName);
 		resultJSON.put("documentId", documentId);
-		resultJSON.put("description", description);
-		resultJSON.put("content", content);
-		resultJSON.put("annotatedcontent", annotatedContent);
-		resultJSON.put("highlightedcontent", highlightedContent);
+		resultJSON.put("documentDescription", description);
+		resultJSON.put("documentContent", content);
+		resultJSON.put("annotatedContent", annotatedContent);
+		resultJSON.put("highlightedContent", highlightedContent);
 		return resultJSON;
 	}
 }

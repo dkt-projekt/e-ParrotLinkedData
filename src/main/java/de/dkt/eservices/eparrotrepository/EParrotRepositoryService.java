@@ -1,6 +1,5 @@
 package de.dkt.eservices.eparrotrepository;
 
-import java.io.BufferedWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +16,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import de.dkt.common.filemanagement.FileFactory;
 import de.dkt.common.niftools.NIFReader;
 import de.dkt.eservices.eparrotrepository.ddbb.Collection;
 import de.dkt.eservices.eparrotrepository.ddbb.Document;
@@ -26,9 +24,8 @@ import de.dkt.eservices.eparrotrepository.ddbb.User;
 import de.dkt.eservices.eparrotrepository.geolocalization.Geolocalization;
 import de.dkt.eservices.eparrotrepository.geolocalization.GeolocalizedElement;
 import de.dkt.eservices.eparrotrepository.geolocalization.GeolocalizedElement.GeoElementType;
-import de.dkt.eservices.eparrotrepository.semanticexploration.SemanticEntity;
 import de.dkt.eservices.eparrotrepository.geolocalization.Geolocation;
-import de.dkt.eservices.eparrotrepository.timelining.TimeConversion;
+import de.dkt.eservices.eparrotrepository.semanticexploration.SemanticEntity;
 import de.dkt.eservices.eparrotrepository.timelining.TimeExpressionRange;
 import de.dkt.eservices.eparrotrepository.timelining.TimelinedElement;
 import de.dkt.eservices.eparrotrepository.timelining.TimelinedElement.TimeElementType;
@@ -259,7 +256,44 @@ public class EParrotRepositoryService {
 		mapaux.put("outformat", "turtle");
 		mapaux.put("mode", "spot");
 		map.put("ner_PER_de", mapaux);
-		
+
+		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
+		mapaux.put("analysis", "ner");
+		mapaux.put("language", "en");
+		mapaux.put("models", "ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC");
+		mapaux.put("informat", "turtle");
+		mapaux.put("outformat", "turtle");
+		mapaux.put("mode", "spot");
+		map.put("ner_PER_ORG_LOC_en_spot", mapaux);
+
+
+		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
+		mapaux.put("analysis", "ner");
+		mapaux.put("language", "en");
+		mapaux.put("models", "ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC");
+		mapaux.put("informat", "turtle");
+		mapaux.put("outformat", "turtle");
+		mapaux.put("mode", "link");
+		map.put("ner_PER_ORG_LOC_en_link", mapaux);
+
+		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
+		mapaux.put("analysis", "ner");
+		mapaux.put("language", "en");
+		mapaux.put("models", "ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC");
+		mapaux.put("informat", "turtle");
+		mapaux.put("outformat", "turtle");
+		mapaux.put("mode", "all");
+		map.put("ner_PER_ORG_LOC_en_all", mapaux);
+
+
+		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
+		mapaux.put("analysis", "temp");
+		mapaux.put("language", "en");
+		mapaux.put("models", "englishDates");
+		mapaux.put("informat", "turtle");
+		mapaux.put("outformat", "turtle");
+		map.put("temp_en", mapaux);
+
 		boolean access = databaseService.checkCollectionPermision(collectionName, user);
 		if(!access){
 			String msg = "User \""+user+"\" has not rights for accessing the collection \""+collectionName+"\"";
