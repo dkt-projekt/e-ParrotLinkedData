@@ -82,9 +82,9 @@ public class ParrotDatabaseService {
     	}
 	}
 	
-	public Document getDocument(String documentId) throws ExternalServiceFailedException {
+	public Document getDocument(String documentName) throws ExternalServiceFailedException {
         try {
-        	return parrotDAO.getDocument(documentId);
+        	return parrotDAO.getDocument(documentName);
     	} catch (Exception e) {
     		e.printStackTrace();
         	logger.error(e.getMessage());

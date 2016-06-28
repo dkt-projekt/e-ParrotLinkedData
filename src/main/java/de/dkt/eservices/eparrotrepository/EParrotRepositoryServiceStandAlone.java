@@ -391,12 +391,12 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-			@PathVariable(value = "collection") String collectionId,
-			@PathVariable(value = "document") String documentId,
+			@PathVariable(value = "collection") String collectionName,
+			@PathVariable(value = "document") String documentName,
 			@RequestParam(value = "limit", required = false, defaultValue="3") int limit,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			String jsonString = repositoryService.getDocumentOverview(documentId, collectionId, limit);
+			String jsonString = repositoryService.getDocumentOverview(documentName, collectionName, limit);
 
 			HttpHeaders responseHeaders = new HttpHeaders();
 			responseHeaders.add("Content-Type", RDFSerialization.JSON.name());

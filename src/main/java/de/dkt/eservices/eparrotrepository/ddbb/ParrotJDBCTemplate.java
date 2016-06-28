@@ -121,9 +121,9 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	}
 
 	@Override
-	public Document getDocument(String documentId) {
-		String SQL = "select * from Documents where documentId = ?";
-		Document doc = jdbcTemplateObject.queryForObject(SQL, new Object[]{documentId}, new DocumentMapper());
+	public Document getDocument(String documentName) {
+		String SQL = "select * from Documents where documentName = ?";
+		Document doc = jdbcTemplateObject.queryForObject(SQL, new Object[]{documentName}, new DocumentMapper());
 		return doc;
 	}
 

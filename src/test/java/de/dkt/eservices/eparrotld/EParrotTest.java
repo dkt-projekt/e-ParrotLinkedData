@@ -288,6 +288,16 @@ public class EParrotTest {
 
 	}
 
+	@Test
+	public void test6_1_documentOverview() throws UnirestException, IOException,Exception {
+				HttpResponse<String> response = request("collection1/document1Turtle/overview").asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertEquals("{}", response.getBody());
+		
+	}
+	
+	
+	
 //	@Test
 //	public void testETimeliningProcessDocument() throws UnirestException, IOException,Exception {
 //		String indexPath = "";

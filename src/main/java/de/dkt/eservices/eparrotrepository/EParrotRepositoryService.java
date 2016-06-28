@@ -708,12 +708,12 @@ public class EParrotRepositoryService {
 		return null;
 	}
 	
-	public String getDocumentOverview(String documentId, String collectionId, int limit) {
-		return getDocumentOverviewJSON(documentId, collectionId, limit).toString();
+	public String getDocumentOverview(String documentName, String collectionName, int limit) {
+		return getDocumentOverviewJSON(documentName, collectionName, limit).toString();
 	}
 		
-	public JSONObject getDocumentOverviewJSON(String documentId, String collectionId, int limit) {
-		Document document = databaseService.getDocument(documentId);
+	public JSONObject getDocumentOverviewJSON(String documentName, String collectionName, int limit) {
+		Document document = databaseService.getDocument(documentName);
 		return document.getJSONObject();
 	}
 
