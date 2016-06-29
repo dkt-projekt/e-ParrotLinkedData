@@ -292,8 +292,11 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			SQL0 += " AND Documents.documentName='"+documentName+"'";
 		}
 
+		System.out.println(SQL0);
+		
 		List<Integer> lu = jdbcTemplateObject.query(SQL0, new IntegerMapper());
 //		User u = jdbcTemplateObject.queryForObject(SQL0, new UserMapper());
+		System.out.println(lu.size());
 		if(lu.isEmpty()){
 			return false;
 		}
@@ -313,4 +316,32 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		jdbcTemplateObject.update(SQL, documentId);
 		return;		
 	}
+	
+	
+	/**
+	 * MODELS methods
+	 */
+	
+	public List<NLPModel> getModels(){
+		String SQL0 = "select * from Models";
+		List<NLPModel> lu = jdbcTemplateObject.query(SQL0, new NLPModelMapper());
+		if(lu.isEmpty()){
+			return null;
+		}
+		return lu;
+	}
+	
+	public boolean addModel(String name, String type, String url, String analysis, String models, String language, String informat, String outformat, String mode){
+		try {
+			String SQL = "insert into Models (modelId, modelName, modelType, url, analysis, models, language, informat, outformat, mode) "
+					+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			jdbcTemplateObject.update( SQL, name, type, url, analysis, models, language, informat, outformat, mode);
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	
 }

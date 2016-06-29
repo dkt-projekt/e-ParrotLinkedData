@@ -208,5 +208,13 @@ public class ParrotDatabaseService {
 		}
 		throw new ExternalServiceFailedException("The user has not permission to delete this document.");
 	}
+	
+	public List<NLPModel> getModels(){
+		return parrotDAO.getModels();
+	}
+	
+	public boolean addModel(String name, String type, String url, String analysis, String models, String language, String informat, String outformat, String mode){
+		return parrotDAO.addModel(name, type, url, analysis, models, language, informat, outformat, mode);
+	}
 
 }

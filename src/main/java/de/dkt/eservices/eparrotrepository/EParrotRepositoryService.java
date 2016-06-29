@@ -19,6 +19,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import de.dkt.common.niftools.NIFReader;
 import de.dkt.eservices.eparrotrepository.ddbb.Collection;
 import de.dkt.eservices.eparrotrepository.ddbb.Document;
+import de.dkt.eservices.eparrotrepository.ddbb.NLPModel;
 import de.dkt.eservices.eparrotrepository.ddbb.ParrotDatabaseService;
 import de.dkt.eservices.eparrotrepository.ddbb.User;
 import de.dkt.eservices.eparrotrepository.geolocalization.Geolocalization;
@@ -48,202 +49,44 @@ public class EParrotRepositoryService {
 	@Autowired
 	ParrotDatabaseService databaseService;
     
-	public String listUsers(int limit){
-		return listUsersJSON(limit).toString();
-	}
+	HashMap<String, HashMap<String,String>> map;
 	
-	public JSONObject listUsersJSON(int limit){
-		List<User> list = databaseService.listUsers();
-		List<User> list2 = new LinkedList<User>();
-		if(limit>0){
-			int counter = 0;
-			for (User u: list) {
-				if(counter<limit){
-					list2.add(u);
-					counter++;
-				}
-			}
-			return convertUsersListIntoJSON(list2);
-		}
-		else{
-			return convertUsersListIntoJSON(list);
-		}
+	public EParrotRepositoryService() {
+		initializeModels();
 	}
-
-	public String listCollections(String user,int limit){
-		return listCollectionsJSON(user, limit).toString();
-	}
-	
-	public JSONObject listCollectionsJSON(String user,int limit){
-		List<Collection> collections = databaseService.listCollections(user);
-		List<Collection> list2 = new LinkedList<Collection>();
-		if(limit>0){
-			int counter = 0;
-			for (Collection col: collections) {
-				if(counter<limit){
-					list2.add(col);
-					counter++;
-				}
-			}
-			return convertListIntoJSON(list2);
-		}
-		else{
-			return convertListIntoJSON(collections);
-		}
-	}
-
-	private JSONObject convertUsersListIntoJSON(List<User> list) {
-		JSONObject obj = new JSONObject();
-		JSONObject joUsers= new JSONObject();
-		int i=0;
-		System.out.println(list.size());
-		for (User u: list) {
-				System.out.println("-------is user:");
-				if(u==null){
-					System.out.println("u is NULL");
-				}
-				joUsers.put("user"+(i+1), u.getJSONObject());
-			i++;
-		}
-		if(joUsers.length()>0){
-			obj.put("users", joUsers);
-		}
-		return obj;
-	}
-	
-	private JSONObject convertListIntoJSON(List list) {
-		JSONObject obj = new JSONObject();
-		JSONObject joCollections = new JSONObject();
-		JSONObject joDocuments= new JSONObject();
-		JSONObject joUsers= new JSONObject();
-		int i=0;
-//		System.out.println(list.size());
-		for (Object o: list) {
-			if(o instanceof User){
-//				System.out.println("-------is user:");
-				User u = (User) o;
-				joUsers.put("user"+(i+1), u.getJSONObject());
-			}
-			else if(o instanceof Collection){
-//				System.out.println("-------is collection:");
-				Collection c = (Collection) o;
-				joCollections.put("collection"+(i+1), c.getJSONObject());
-			}
-			else if(o instanceof Document){
-//				System.out.println("-------is document:");
-				Document d = (Document) o;
-				joDocuments.put("document"+(i+1), d.getJSONObject());
-			}
-			else{
-				System.out.println("ERROR: element type not supported.");
-			}
-			i++;
-		}
-		if(joCollections.length()>0){
-			obj.put("collections", joCollections);
-		}
-		if(joDocuments.length()>0){
-			obj.put("documents", joDocuments);
-		}
-		if(joUsers.length()>0){
-			obj.put("users", joUsers);
-		}
-			return obj;
 		
-	}
-	
-	public int createUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
-		return databaseService.storeUser(newUser, newPassword, newUserName, newUserRole, user, password);
-	}
-	
-	public int createCollection(String collectionName, String description, String user, boolean priv, String analysis, String sUsers) throws ExternalServiceFailedException {
-		return databaseService.storeCollection(collectionName, user, description, priv, analysis, sUsers);
-	}
-	
-	public String listDocuments(String collectionName,String user,int limit){
-		return listDocumentsJSON(collectionName, user, limit).toString();
-	}
-	
-	public JSONObject listDocumentsJSON(String collectionName,String user,int limit){
-		List<Document> list = databaseService.listDocumentByName(collectionName, user);
-		List<Document> list2 = new LinkedList<Document>();
-		if(limit>0){
-			int counter = 0;
-			for (Document doc: list) {
-				if(counter<limit){
-					list2.add(doc);
-					counter++;
-				}
-			}
-			return convertListIntoJSON(list2);
-		}
-		else{
-			return convertListIntoJSON(list);
-		}
-	}
-	
-	public String getCollectionOverview(String collectionId,int limit){
-		return getCollectionOverviewJSON(collectionId, limit).toString();
-	}
-	
-	public JSONObject getCollectionOverviewJSON(String collectionName,int limit){
-		Collection collection = databaseService.getCollectionByName(collectionName);
-		JSONObject result = collection.getJSONObject();
-		return result;
-	}
-
-	public int addDocumentToCollection(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
-//		boolean access = databaseService.checkCollectionPermision(collectionName, user);
-//		if(!access){
-//			String msg = "User \""+user+"\" has not rights for accessing the collection \""+collectionName+"\"";
-//			logger.error(msg);
-//			throw new ExternalServiceFailedException(msg);
-//		}
-
-		boolean access2 = databaseService.checkDocumentPermision(collectionName, user);
-		if(!access2){
-			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
-			logger.error(msg);
-			throw new ExternalServiceFailedException(msg);
-		}
-
-		content = aContent;
-		String annotatedContent= annotateDocument(aContent,analysis);
-		String highlightedContent = highlighText(annotatedContent);
-		
-		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
-//		System.out.println("Annotated2: " + annotatedContent);
-//		System.out.println("Highlighted: " + highlightedContent);
-
-		if(!updateCollection(collectionName)){
-			logger.error("The collection has not been updated!!");
-		}
-		return docId;
-	}
-
-	public boolean updateDocument(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
-		boolean access2 = databaseService.checkDocumentPermision(collectionName, user);
-		if(!access2){
-			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
-			logger.error(msg);
-			throw new ExternalServiceFailedException(msg);
-		}
-
-		content = aContent;
-		String annotatedContent= annotateDocument(aContent,analysis);
-		String highlightedContent = highlighText(annotatedContent);
-		
-		boolean doc = databaseService.updateDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
-		if(!updateCollection(collectionName)){
-			logger.error("The collection has not been updated!!");
-		}
-		return doc;
-	}
-
-	public String annotateDocument(String aContent, String analysis) {
-		HashMap<String, HashMap<String,String>> map = new HashMap<String, HashMap<String,String>>();
+	public void initializeModels(){
+		map = new HashMap<String, HashMap<String,String>>();
 		String baseUrl = "http://dev.digitale-kuratierung.de/api";
-		HashMap<String,String> mapaux = new HashMap<String,String>();
+		
+		List<NLPModel> nlpmodels = databaseService.getModels();
+		
+		for (NLPModel m : nlpmodels) {
+			HashMap<String,String> mapaux = new HashMap<String,String>();
+			mapaux.put("url", baseUrl + m.getUrl());
+			String type = m.getType();			
+			mapaux.put("type", type);
+			mapaux.put("informat", m.getInformat());
+			mapaux.put("outformat", m.getOutformat());
+			if(type.equalsIgnoreCase("ner")){
+				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				mapaux.put("models", m.getModels());
+				mapaux.put("mode", m.getMode());
+			}
+			else if(type.equalsIgnoreCase("dict")){
+				
+			}
+			else if(type.equalsIgnoreCase("temp")){
+				
+			}
+			else if(type.equalsIgnoreCase("translate")){
+				
+			}
+			map.put(m.getModelName(), mapaux);
+		}
+		
+/*		HashMap<String,String> mapaux = new HashMap<String,String>();
 		mapaux.put("url", baseUrl + "/e-nlp/namedEntityRecognition");
 		mapaux.put("analysis", "ner");
 		mapaux.put("language", "en");
@@ -317,8 +160,209 @@ public class EParrotRepositoryService {
 		mapaux.put("models", "englishDates");
 		mapaux.put("informat", "turtle");
 		mapaux.put("outformat", "turtle");
-		map.put("temp_en", mapaux);
+		map.put("temp_en", mapaux);*/
+	}
 
+	public String listUsers(int limit){
+		return listUsersJSON(limit).toString();
+	}
+	
+	public JSONObject listUsersJSON(int limit){
+		List<User> list = databaseService.listUsers();
+		List<User> list2 = new LinkedList<User>();
+		if(limit>0){
+			int counter = 0;
+			for (User u: list) {
+				if(counter<limit){
+					list2.add(u);
+					counter++;
+				}
+			}
+			return convertUsersListIntoJSON(list2);
+		}
+		else{
+			return convertUsersListIntoJSON(list);
+		}
+	}
+
+	public String listCollections(String user,int limit){
+		return listCollectionsJSON(user, limit).toString();
+	}
+	
+	public JSONObject listCollectionsJSON(String user,int limit){
+		List<Collection> collections = databaseService.listCollections(user);
+		List<Collection> list2 = new LinkedList<Collection>();
+		if(limit>0){
+			int counter = 0;
+			for (Collection col: collections) {
+				if(counter<limit){
+					list2.add(col);
+					counter++;
+				}
+			}
+			return convertListIntoJSON(list2);
+		}
+		else{
+			return convertListIntoJSON(collections);
+		}
+	}
+
+	private JSONObject convertUsersListIntoJSON(List<User> list) {
+		JSONObject obj = new JSONObject();
+		JSONObject joUsers= new JSONObject();
+		int i=0;
+		System.out.println(list.size());
+		for (User u: list) {
+				System.out.println("-------is user:");
+				if(u==null){
+					System.out.println("u is NULL");
+				}
+				joUsers.put("user"+(i+1), u.getJSONObject());
+			i++;
+		}
+		if(joUsers.length()>0){
+			obj.put("users", joUsers);
+		}
+		return obj;
+	}
+	
+	private JSONObject convertListIntoJSON(List list) {
+		JSONObject obj = new JSONObject();
+		JSONObject joCollections = new JSONObject();
+		JSONObject joDocuments= new JSONObject();
+		JSONObject joUsers= new JSONObject();
+		JSONObject joModels= new JSONObject();
+		int i=0;
+//		System.out.println(list.size());
+		for (Object o: list) {
+			if(o instanceof User){
+//				System.out.println("-------is user:");
+				User u = (User) o;
+				joUsers.put("user"+(i+1), u.getJSONObject());
+			}
+			else if(o instanceof Collection){
+//				System.out.println("-------is collection:");
+				Collection c = (Collection) o;
+				joCollections.put("collection"+(i+1), c.getJSONObject());
+			}
+			else if(o instanceof Document){
+//				System.out.println("-------is document:");
+				Document d = (Document) o;
+				joDocuments.put("document"+(i+1), d.getJSONObject());
+			}
+			else if(o instanceof Model){
+//				System.out.println("-------is document:");
+				de.dkt.eservices.eparrotrepository.ddbb.NLPModel d = (de.dkt.eservices.eparrotrepository.ddbb.NLPModel) o;
+				joDocuments.put("model"+(i+1), d.getJSONObject());
+			}
+			else{
+				System.out.println("ERROR: element type not supported.");
+			}
+			i++;
+		}
+		if(joCollections.length()>0){
+			obj.put("collections", joCollections);
+		}
+		if(joDocuments.length()>0){
+			obj.put("documents", joDocuments);
+		}
+		if(joUsers.length()>0){
+			obj.put("users", joUsers);
+		}
+		if(joModels.length()>0){
+			obj.put("models", joUsers);
+		}
+		return obj;		
+	}
+	
+	public int createUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
+		return databaseService.storeUser(newUser, newPassword, newUserName, newUserRole, user, password);
+	}
+	
+	public int createCollection(String collectionName, String description, String user, boolean priv, String analysis, String sUsers) throws ExternalServiceFailedException {
+		return databaseService.storeCollection(collectionName, user, description, priv, analysis, sUsers);
+	}
+	
+	public String listDocuments(String collectionName,String user,int limit){
+		return listDocumentsJSON(collectionName, user, limit).toString();
+	}
+	
+	public JSONObject listDocumentsJSON(String collectionName,String user,int limit){
+		List<Document> list = databaseService.listDocumentByName(collectionName, user);
+		List<Document> list2 = new LinkedList<Document>();
+		if(limit>0){
+			int counter = 0;
+			for (Document doc: list) {
+				if(counter<limit){
+					list2.add(doc);
+					counter++;
+				}
+			}
+			return convertListIntoJSON(list2);
+		}
+		else{
+			return convertListIntoJSON(list);
+		}
+	}
+	
+	public String getCollectionOverview(String collectionId,int limit){
+		return getCollectionOverviewJSON(collectionId, limit).toString();
+	}
+	
+	public JSONObject getCollectionOverviewJSON(String collectionName,int limit){
+		Collection collection = databaseService.getCollectionByName(collectionName);
+		JSONObject result = collection.getJSONObject();
+		return result;
+	}
+
+	public int addDocumentToCollection(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
+		boolean access = databaseService.checkCollectionPermision(collectionName, user);
+		if(!access){
+			String msg = "User \""+user+"\" has not rights for accessing the collection \""+collectionName+"\"";
+			logger.error(msg);
+			throw new ExternalServiceFailedException(msg);
+		}
+//		boolean access2 = databaseService.checkDocumentPermision(documentName, user);
+//		if(!access2){
+//			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
+//			logger.error(msg);
+//			throw new ExternalServiceFailedException(msg);
+//		}
+
+		content = aContent;
+		String annotatedContent= annotateDocument(aContent,analysis);
+		String highlightedContent = highlighText(annotatedContent);
+		
+		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
+//		System.out.println("Annotated2: " + annotatedContent);
+//		System.out.println("Highlighted: " + highlightedContent);
+
+		if(!updateCollection(collectionName)){
+			logger.error("The collection has not been updated!!");
+		}
+		return docId;
+	}
+
+	public boolean updateDocument(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
+		boolean access2 = databaseService.checkDocumentPermision(collectionName, user);
+		if(!access2){
+			String msg = "User \""+user+"\" has not rights for accessing the document \""+documentName+"\"";
+			logger.error(msg);
+			throw new ExternalServiceFailedException(msg);
+		}
+
+		content = aContent;
+		String annotatedContent= annotateDocument(aContent,analysis);
+		String highlightedContent = highlighText(annotatedContent);
+		
+		boolean doc = databaseService.updateDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
+		if(!updateCollection(collectionName)){
+			logger.error("The collection has not been updated!!");
+		}
+		return doc;
+	}
+
+	public String annotateDocument(String aContent, String analysis) {
 		String annotatedContent = aContent;
 		String [] analysisParts = analysis.split(",");
 		try{
@@ -364,10 +408,6 @@ public class EParrotRepositoryService {
 
 	public boolean updateCollection(String collectionName){
 		List<Document> docsList = databaseService.listDocumentByName(collectionName, null);
-		
-		// Get all the documents of the collection, and two options:
-		//		1. Send them as JSON.
-		//		2. Store them into files and send the files.		
 		
 		String timelining = doCollectionTimelining(collectionName,docsList);
 		String geolocalization = doCollectionGeolocalization(collectionName,docsList);
@@ -538,6 +578,9 @@ public class EParrotRepositoryService {
 				}
 			}
 		}
+		
+		//TODO search for the number appearances isntead of 1,0
+		
 		
 		//Generate headers for the file.
 		String arff = "@RELATION "+collectionName+"_Clustering\n";
@@ -712,11 +755,11 @@ public class EParrotRepositoryService {
 		return null;
 	}
 	
-	public String getDocumentOverview(String documentName, String collectionName, String user, int limit) {
-		return getDocumentOverviewJSON(documentName, collectionName, user, limit).toString();
+	public String getDocumentOverview(String documentName, String collectionName, String user) {
+		return getDocumentOverviewJSON(documentName, collectionName, user).toString();
 	}
 		
-	public JSONObject getDocumentOverviewJSON(String documentName, String collectionName, String user, int limit) {
+	public JSONObject getDocumentOverviewJSON(String documentName, String collectionName, String user) {
 		Document document = databaseService.getDocument(documentName, user);
 		return document.getJSONObject();
 	}
@@ -748,4 +791,45 @@ public class EParrotRepositoryService {
        		return false;
        	}
 	}
+
+	public String getModels(){
+		return convertListIntoJSON(databaseService.getModels()).toString();
+	}
+	
+	public boolean addModel(String name, String type, String url, String analysis, String models, String language, String informat, String outformat, String mode, String content){
+		if(type.equalsIgnoreCase("dict")){
+			Unirest.setTimeouts(10000, 10000000);
+			try{
+				HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/......")
+//						.queryString("input", annotatedContent)
+					.queryString("analysis", "dict")
+					.queryString("language", language)
+					.queryString("modelName", name)
+//					.queryString("input", content)
+					.body(content)
+					.asString();
+
+				if(response.getStatus() == 200){
+					if(analysis==null){
+						analysis = "dict";
+					}
+					return databaseService.addModel(name, type, url, analysis, name, language, informat, outformat, mode);
+				}
+				else{
+					String msg = "Error at generating dictinary-based model: "+name;
+					logger.error(msg);
+					return false;
+				}
+			}
+			catch(Exception e){
+				String msg = "Error at generating dictinary-based model: "+name;
+				logger.error(msg, e);
+				throw new ExternalServiceFailedException(msg);
+			}
+		}
+		else{
+			return databaseService.addModel(name, type, url, analysis, models, language, informat, outformat, mode);
+		}
+	}
+
 }

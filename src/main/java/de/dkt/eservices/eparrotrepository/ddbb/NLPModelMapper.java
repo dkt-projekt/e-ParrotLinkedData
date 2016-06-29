@@ -1,0 +1,37 @@
+package de.dkt.eservices.eparrotrepository.ddbb;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+public class NLPModelMapper implements RowMapper<NLPModel> {
+
+	public NLPModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+		NLPModel m = new NLPModel();
+		m.setModelId(rs.getInt("modelId"));
+		m.setModelName(rs.getString("modelName"));
+
+		String type = rs.getString("modelType");
+
+		m.setInformat(rs.getString("informat"));
+		m.setOutformat(rs.getString("outformat"));
+		m.setUrl(rs.getString("url"));
+		if(type.equalsIgnoreCase("ner")){
+			m.setAnalysis(rs.getString("analysis"));
+			m.setLanguage(rs.getString("language"));
+			m.setModels(rs.getString("models"));
+			m.setMode(rs.getString("mode"));
+		}
+		else if(type.equalsIgnoreCase("timex")){
+			//			      m.set(rs.getString(""));
+			//			      m.set(rs.getString(""));
+			//			      m.set(rs.getString(""));
+		}
+		else if(type.equalsIgnoreCase("translate")){
+
+		}
+		return m;
+	}
+
+}

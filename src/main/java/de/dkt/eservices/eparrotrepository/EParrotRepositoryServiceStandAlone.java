@@ -381,6 +381,9 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 	@RequestMapping(value = "/e-parrot/{collection}/{document}/overview", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> getDocumentOverview(
 			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+			@PathVariable(value = "document") String documentName,
+
 			@RequestParam(value = "input", required = false) String input,
 			@RequestParam(value = "i", required = false) String i,
 			@RequestParam(value = "informat", required = false) String informat,
@@ -389,16 +392,10 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestParam(value = "o", required = false) String o,
 			@RequestParam(value = "prefix", required = false) String prefix,
 			@RequestParam(value = "p", required = false) String p,
-			@RequestHeader(value = "Accept", required = false) String acceptHeader,
-			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
-
-			@PathVariable(value = "collection") String collectionName,
-			@PathVariable(value = "document") String documentName,
-			@PathVariable(value = "user") String user,
-			@RequestParam(value = "limit", required = false, defaultValue="3") int limit,
+			@RequestParam(value = "user", required=false) String user,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			String jsonString = repositoryService.getDocumentOverview(documentName, collectionName, user, limit);
+			String jsonString = repositoryService.getDocumentOverview(documentName, collectionName, user);
 
 			HttpHeaders responseHeaders = new HttpHeaders();
 //			responseHeaders.add("Content-Type", RDFSerialization.JSON.name());
@@ -502,4 +499,62 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 		}
 	}
     
+	
+	@RequestMapping(value = "/e-parrot/models/add", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> addModel(
+			HttpServletRequest request, 
+			@RequestParam(value = "modelName", required = false) String modelName,
+			@RequestParam(value = "modelType", required = false) String modelType,
+			@RequestParam(value = "modelInformat", required = false) String modelInformat,
+			@RequestParam(value = "modelOutformat", required = false) String modelOutformat,
+			@RequestParam(value = "url", required = false) String url,
+			@RequestParam(value = "analysis", required = false) String analysis,
+			@RequestParam(value = "language", required = false) String language,
+			@RequestParam(value = "models", required = false) String models,
+			@RequestParam(value = "mode", required = false) String mode,
+			@RequestParam(value = "content", required = false) String content,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			if(!modelType.equalsIgnoreCase("ner") && !modelType.equalsIgnoreCase("dict") && !modelType.equalsIgnoreCase("translate") && !modelType.equalsIgnoreCase("temp") ){
+            	logger.error("Model Type is not valid.");
+                throw new BadRequestException("Model Type is not valid.");
+			}
+			if(modelInformat==null){
+				modelInformat = "turtle";
+			}
+			if(modelOutformat==null){
+				modelOutformat = "turtle";
+			}
+			if(url==null){
+				url = "http://dev.digitale-kuratierung.de/api/namedEntityRecognition";
+			}
+
+			String result = "";
+			if(repositoryService.addModel(modelName, modelType, url, analysis, models, language, modelInformat, modelOutformat, mode, content)){
+				result = "The model "+modelName+" has been succesfully created.";
+			}
+			else{
+				result = "The model "+modelName+" has been succesfully created.";
+			}
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
+	
+	@RequestMapping(value = "/e-parrot/models/list", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getModelsList(
+			HttpServletRequest request, 
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String result = repositoryService.getModels();
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
 }
