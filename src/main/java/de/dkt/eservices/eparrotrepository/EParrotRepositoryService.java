@@ -254,10 +254,9 @@ public class EParrotRepositoryService {
 				Document d = (Document) o;
 				joDocuments.put("document"+(i+1), d.getJSONObject());
 			}
-			else if(o instanceof Model){
-//				System.out.println("-------is document:");
-				de.dkt.eservices.eparrotrepository.ddbb.NLPModel d = (de.dkt.eservices.eparrotrepository.ddbb.NLPModel) o;
-				joDocuments.put("model"+(i+1), d.getJSONObject());
+			else if(o instanceof NLPModel){
+				NLPModel d = (NLPModel) o;
+				joModels.put("model"+(i+1), d.getJSONObject());
 			}
 			else{
 				System.out.println("ERROR: element type not supported.");
@@ -274,7 +273,7 @@ public class EParrotRepositoryService {
 			obj.put("users", joUsers);
 		}
 		if(joModels.length()>0){
-			obj.put("models", joUsers);
+			obj.put("models", joModels);
 		}
 		return obj;		
 	}
@@ -797,14 +796,18 @@ public class EParrotRepositoryService {
 	}
 
 	public String getModels(){
-		return convertListIntoJSON(databaseService.getModels()).toString();
+		List<NLPModel> models = databaseService.getModels();
+		return convertListIntoJSON(models).toString();
 	}
 	
 	public boolean addModel(String name, String type, String url, String analysis, String models, String language, String informat, String outformat, String mode, String content){
 		if(type.equalsIgnoreCase("dict")){
 			Unirest.setTimeouts(10000, 10000000);
+			
+			name = name + "_OTHER";
+			
 			try{
-				HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/......")
+				HttpResponse<String> response = Unirest.post("http://api.digitale-kuratierung.de/api/e-nlp/trainModel")
 //						.queryString("input", annotatedContent)
 					.queryString("analysis", "dict")
 					.queryString("language", language)
@@ -821,11 +824,13 @@ public class EParrotRepositoryService {
 				}
 				else{
 					String msg = "Error at generating dictinary-based model: "+name;
+					System.out.println("DEBUG: "+msg);
 					logger.error(msg);
 					return false;
 				}
 			}
 			catch(Exception e){
+				e.printStackTrace();
 				String msg = "Error at generating dictinary-based model: "+name;
 				logger.error(msg, e);
 				throw new ExternalServiceFailedException(msg);

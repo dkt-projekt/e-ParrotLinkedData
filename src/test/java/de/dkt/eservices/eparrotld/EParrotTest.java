@@ -3,6 +3,7 @@ package de.dkt.eservices.eparrotld;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,6 +11,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.springframework.context.ApplicationContext;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -357,6 +359,69 @@ public class EParrotTest {
 //		
 //	}
 	
-	String expectedOutputRetrieval = "{\"results\":{\"documents\":{\"document1\":{\"score\":0.028767451643943787,\"docId\":1,\"content\":\"1936\\n\\nCoup leader Sanjurjo was killed in a plane crash on 20 July, leaving an effective command split between Mola in the North and Franco in the South. On 21 July, the fifth day of the rebellion, the Nationalists captured the main Spanish naval base at Ferrol in northwestern Spain. A rebel force under Colonel Beorlegui Canet, sent by General Emilio Mola, undertook the Campaign of Guipúzcoa from July to September. The capture of Guipúzcoa isolated the Republican provinces in the north. On 5 September, after heavy fighting the force took Irún, closing the French border to the Republicans. On 13 September, the Basques surrendered San Sebastián to the Nationalists, who then advanced toward their capital, Bilbao. The Republican militias on the border of Viscaya halted these forces at the end of September.\\n\"}},\"numberResults\":1,\"querytext\":\"content:sanjurjo\"}}";
+	@Test
+	public void test9_1_listModels() throws UnirestException, IOException,Exception {
+		HttpResponse<String> response = request("models/list")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+//		String expectedDocuments = "{\"models\":{\"model4\":{\"modelName\":\"temp_en\",\"models\":\"englishDates\",\"informat\":\"turtle\",\"modelId\":4,\"language\":\"en\",\"modelType\":\"timex\",\"analysis\":\"temp\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model3\":{\"mode\":\"all\",\"modelName\":\"ner_PER_ORG_LOC_en_all\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":3,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model2\":{\"mode\":\"link\",\"modelName\":\"ner_PER_ORG_LOC_en_link\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":2,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model1\":{\"mode\":\"spot\",\"modelName\":\"ner_PER_ORG_LOC_en_spot\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":1,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"}}}";
+//		Assert.assertEquals(expectedDocuments,response.getBody());
+		String expectedDocuments = "{\"models\":{\"model4\":{\"modelName\":\"temp_en\",\"models\":\"englishDates\",\"informat\":\"turtle\",\"modelId\":4,\"language\":\"en\",\"modelType\":\"timex\",\"analysis\":\"temp\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model3\":{\"mode\":\"all\",\"modelName\":\"ner_PER_ORG_LOC_en_all\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":3,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model2\":{\"mode\":\"link\",\"modelName\":\"ner_PER_ORG_LOC_en_link\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":2,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model1\":{\"mode\":\"spot\",\"modelName\":\"ner_PER_ORG_LOC_en_spot\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":1,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"";
+		Assert.assertTrue(response.getBody().startsWith(expectedDocuments));
+	}
+
+	@Test
+	public void test9_2_addModel() throws UnirestException, IOException,Exception {
+		
+		String dictionaryContent = "Armentières	http://www.geonames.org/3036903\n"
+				+"Hampstead Heath	http://www.geonames.org/6618525/hampstead-heath.html\n"
+				+"Haarlem 	http://www.geonames.org/2755003\n"
+				+"England	http://www.geonames.org/6269131\n"
+				+"Lourds	http://www.geonames.org/2997395/lourdes.html\n"
+				+"Graswang	http://www.geonames.org/2917958\n"
+				+"Straßburg	http://www.geonames.org/ 2764186\n"
+				+"La Spezia	http://www.geonames.org/3175081\n"
+				+"Aland Islands 	http://www.geonames.org/661883\n"
+				+"Sonnenspitze 	http://www.geonames.org/2764900\n"
+				+"Luxor 	http://www.geonames.org/360502\n"
+				+"San Sebastian	http://www.geonames.org/3110044\n"
+				+"Rudolstadt	http://www.geonames.org/2843355\n"
+				+"Mount Scopus	http://www.geonames.org/281956\n"
+				+"Molokai	http://www.geonames.org/5851218/moloka-i.html";
+
+		Date d = new Date();
+		HttpResponse<String> response = request("models/add")
+				.queryString("modelName", "dict_test_"+d.getTime())
+				.queryString("modelType", "dict")
+				.queryString("modelInformat", "turtle")
+				.queryString("modelOutformat", "turtle")
+				.queryString("url", "http://dev.digitale-kuratierung.de/e-smt/")
+				.queryString("analysis", "dict")
+				.queryString("language", "en")
+				.queryString("models", "")
+				.queryString("mode", "")
+				.queryString("content", dictionaryContent)
+				.body("")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertTrue(response.getBody().contains("successfully"));
+
+		response = request("models/add")
+				.queryString("modelName", "dict_test_"+d.getTime())
+				.queryString("modelType", "dict")
+				.queryString("modelInformat", "turtle")
+				.queryString("modelOutformat", "turtle")
+				.queryString("url", "http://dev.digitale-kuratierung.de/e-smt/")
+				.queryString("analysis", "dict")
+				.queryString("language", "en")
+				.queryString("models", "")
+				.queryString("mode", "")
+				.queryString("content", dictionaryContent)
+				.body("")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertFalse(response.getBody().contains("successfully"));}
+	
+
 
 }

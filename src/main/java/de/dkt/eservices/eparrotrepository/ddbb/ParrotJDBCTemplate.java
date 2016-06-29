@@ -338,7 +338,7 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			jdbcTemplateObject.update( SQL, name, type, url, analysis, models, language, informat, outformat, mode);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+//			e.printStackTrace();
 			return false;
 		}
 	}

@@ -1,5 +1,6 @@
 package de.dkt.eservices.eparrotrepository;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -481,11 +482,11 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			String result = null;
 			if(documentId!=null){
 				repositoryService.deleteDocumentById(documentId,user);
-				result = "The document "+documentId+" has been succesfully deleted.";
+				result = "The document "+documentId+" has been successfully deleted.";
 			}
 			else if(documentName!=null){
 				repositoryService.deleteDocumentByName(documentName,user);
-				result = "The document "+documentName+" has been succesfully deleted.";
+				result = "The document "+documentName+" has been successfully deleted.";
 			}
 			else{
             	logger.error("No document identifier provided.");
@@ -515,7 +516,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestParam(value = "content", required = false) String content,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			if(!modelType.equalsIgnoreCase("ner") && !modelType.equalsIgnoreCase("dict") && !modelType.equalsIgnoreCase("translate") && !modelType.equalsIgnoreCase("temp") ){
+			if(modelType==null || (!modelType.equalsIgnoreCase("ner") && !modelType.equalsIgnoreCase("dict") && !modelType.equalsIgnoreCase("translate") && !modelType.equalsIgnoreCase("temp") ) ){
             	logger.error("Model Type is not valid.");
                 throw new BadRequestException("Model Type is not valid.");
 			}
@@ -528,13 +529,17 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			if(url==null){
 				url = "http://dev.digitale-kuratierung.de/api/namedEntityRecognition";
 			}
-
+			if(modelName==null){
+				Date d = new Date();
+				modelName = "model_"+language+"_"+d.getTime();
+			}
+			
 			String result = "";
 			if(repositoryService.addModel(modelName, modelType, url, analysis, models, language, modelInformat, modelOutformat, mode, content)){
-				result = "The model "+modelName+" has been succesfully created.";
+				result = "The model "+modelName+" has been successfully created.";
 			}
 			else{
-				result = "The model "+modelName+" has been succesfully created.";
+				result = "The model "+modelName+" has NOT been created.";
 			}
 			HttpHeaders responseHeaders = new HttpHeaders();
 			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
