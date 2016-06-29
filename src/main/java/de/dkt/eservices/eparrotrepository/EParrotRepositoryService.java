@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,10 +53,12 @@ public class EParrotRepositoryService {
     
 	HashMap<String, HashMap<String,String>> map;
 	
+//	@Autowired
 	public EParrotRepositoryService() {
-		initializeModels();
+//		initializeModels();
 	}
-		
+	
+	@PostConstruct
 	public void initializeModels(){
 		map = new HashMap<String, HashMap<String,String>>();
 		String baseUrl = "http://dev.digitale-kuratierung.de/api";
