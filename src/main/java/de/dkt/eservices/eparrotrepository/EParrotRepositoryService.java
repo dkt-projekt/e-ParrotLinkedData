@@ -343,7 +343,26 @@ public class EParrotRepositoryService {
 
 		content = aContent;
 		String annotatedContent= annotateDocument(aContent,analysis);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println(annotatedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
 		String highlightedContent = highlighText(annotatedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println(highlightedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		
 		
 		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
 //		System.out.println("Annotated2: " + annotatedContent);
@@ -365,7 +384,26 @@ public class EParrotRepositoryService {
 
 		content = aContent;
 		String annotatedContent= annotateDocument(aContent,analysis);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println(annotatedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
 		String highlightedContent = highlighText(annotatedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println(highlightedContent);
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		System.out.println("************************************************************************************");
+		
 		
 		boolean doc = databaseService.updateDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
 		if(!updateCollection(collectionName)){
@@ -706,8 +744,9 @@ public class EParrotRepositoryService {
 				Map<String,String> internalMap = map.get(k);
 				
 				int init = Integer.parseInt(internalMap.get(initTag));
+//				int end = Integer.parseInt(internalMap.get(endTag));
 				boolean added=false;
-				
+
 				for (int i=0;i<list.size() && !added;i++) {
 					Map<String,String> mapL = list.get(i);
 					int auxInit = Integer.parseInt(mapL.get(initTag));
@@ -725,14 +764,12 @@ public class EParrotRepositoryService {
 //					System.out.println("\t" + k2 + " <--> " + internalMap.get(k2));
 //				}
 			}
-
+			
 			int offset = 0;
 			for (Map<String,String> mm : list) {
 				int init = Integer.parseInt(mm.get(initTag));
 				int end = Integer.parseInt(mm.get(endTag));
 				String type = mm.get(typeTag);
-				high = high + anno.substring(offset, init);
-				
 				String label = "";
 				if(type.contains("Location")){
 					label = "label-warning";
@@ -750,9 +787,22 @@ public class EParrotRepositoryService {
 					label = "label-default";
 				}
 				
-				high = high + "<span class=\"label "+label+"\">";
-				high = high + anno.substring(init, end);
-				high = high + "</span>";
+//				System.out.println("\toffset: "+offset+" INIT: "+init+" END: "+end+"  type:"+type);
+				
+				if(offset>init){
+					high = high + "(<span class=\"label "+label+"\">";
+					high = high + anno.substring(init, end);
+					high = high + "</span>)";
+
+					//TODO Consider painting when the ending is longer than the previous clashing endind.
+				}
+				else{
+					high = high + anno.substring(offset, init);
+					high = high + "<span class=\"label "+label+"\">";
+					high = high + anno.substring(init, end);
+					high = high + "</span>";
+				}
+				
 				offset = end;
 //				Set<String> kes2 = mm.keySet();
 //				for (String k2 : kes2) {
@@ -763,9 +813,11 @@ public class EParrotRepositoryService {
 			return high;
 		}
 		catch(Exception e){
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
 			System.out.println("ERROR at generating the highlighted content of the document");
+			return null;
 		}
-		return null;
 	}
 	
 	public String getDocumentOverview(String documentName, String collectionName, String user) {
