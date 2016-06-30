@@ -79,13 +79,22 @@ public class EParrotRepositoryService {
 				mapaux.put("mode", m.getMode());
 			}
 			else if(type.equalsIgnoreCase("dict")){
-				
+				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				mapaux.put("models", m.getModels());
+				mapaux.put("mode", m.getMode());
 			}
 			else if(type.equalsIgnoreCase("temp")){
-				
+				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				mapaux.put("models", m.getModels());
+				mapaux.put("mode", m.getMode());
 			}
 			else if(type.equalsIgnoreCase("translate")){
-				
+				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				mapaux.put("models", m.getModels());
+				mapaux.put("mode", m.getMode());
 			}
 			map.put(m.getModelName(), mapaux);
 		}
@@ -371,34 +380,35 @@ public class EParrotRepositoryService {
 		try{
 			Unirest.setTimeouts(10000, 10000000);
 			for (String an : analysisParts) {
-				HashMap<String,String> tempMap = map.get(an);
-
-				try{
-					HttpResponse<String> response = Unirest.post(tempMap.get("url"))
-//						.queryString("input", annotatedContent)
-						.queryString("analysis", tempMap.get("analysis"))
-						.queryString("language", tempMap.get("language"))
-						.queryString("models", tempMap.get("models"))
-						.queryString("informat", tempMap.get("informat"))
-						.queryString("outformat", tempMap.get("outformat"))
-						.queryString("mode", tempMap.get("mode"))
-						.body(annotatedContent)
-						.asString();
-
-					if(response.getStatus() == 200){
-						annotatedContent = response.getBody();
+				if(map.containsKey(an)){
+					HashMap<String,String> tempMap = map.get(an);
+	
+					try{
+						HttpResponse<String> response = Unirest.post(tempMap.get("url"))
+	//						.queryString("input", annotatedContent)
+							.queryString("analysis", tempMap.get("analysis"))
+							.queryString("language", tempMap.get("language"))
+							.queryString("models", tempMap.get("models"))
+							.queryString("informat", tempMap.get("informat"))
+							.queryString("outformat", tempMap.get("outformat"))
+							.queryString("mode", tempMap.get("mode"))
+							.body(annotatedContent)
+							.asString();
+	
+						if(response.getStatus() == 200){
+							annotatedContent = response.getBody();
+						}
+						else{
+							String msg = "Error at processing the content of the document with model: "+an;
+							logger.error(msg);
+						}
 					}
-					else{
+					catch(Exception e){
 						String msg = "Error at processing the content of the document with model: "+an;
-						logger.error(msg);
+						logger.error(msg, e);
+						throw new ExternalServiceFailedException(msg);
 					}
 				}
-				catch(Exception e){
-					String msg = "Error at processing the content of the document with model: "+an;
-					logger.error(msg, e);
-					throw new ExternalServiceFailedException(msg);
-				}
-					
 			}
 		}
 		catch(Exception e){
@@ -807,7 +817,7 @@ public class EParrotRepositoryService {
 			name = name + "_OTHER";
 			
 			try{
-				HttpResponse<String> response = Unirest.post("http://api.digitale-kuratierung.de/api/e-nlp/trainModel")
+				HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-nlp/trainModel")
 //						.queryString("input", annotatedContent)
 					.queryString("analysis", "dict")
 					.queryString("language", language)
@@ -820,7 +830,9 @@ public class EParrotRepositoryService {
 					if(analysis==null){
 						analysis = "dict";
 					}
-					return databaseService.addModel(name, type, url, analysis, name, language, informat, outformat, mode);
+					if(!databaseService.addModel(name, type, url, analysis, name, language, informat, outformat, mode)){
+						return false;
+					}
 				}
 				else{
 					String msg = "Error at generating dictinary-based model: "+name;
@@ -837,8 +849,12 @@ public class EParrotRepositoryService {
 			}
 		}
 		else{
-			return databaseService.addModel(name, type, url, analysis, models, language, informat, outformat, mode);
+			if(!databaseService.addModel(name, type, url, analysis, models, language, informat, outformat, mode)){
+				return false;
+			}
 		}
+		initializeModels();
+		return true;
 	}
 
 }

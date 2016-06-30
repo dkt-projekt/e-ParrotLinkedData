@@ -107,7 +107,7 @@ public class NLPModel {
 		resultJSON.put("modelId", modelId);
 		resultJSON.put("modelName", modelName);
 		resultJSON.put("modelType", type);
-		resultJSON.put("url", url);
+		resultJSON.put("url", url); 
 		resultJSON.put("analysis", analysis);
 		resultJSON.put("language", language);
 		resultJSON.put("models", models);

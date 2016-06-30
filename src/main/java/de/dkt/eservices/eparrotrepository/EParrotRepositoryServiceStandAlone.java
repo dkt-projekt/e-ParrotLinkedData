@@ -339,7 +339,6 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestParam(value = "documentDescription", required = false) String documentDescription,
 			@RequestParam(value = "user", required = false) String user,
 			@RequestParam(value = "format", required = false) String format,
-			@RequestParam(value = "path", required = false) String path,
 			@RequestParam(value = "analysis", required = false) String analysis,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
@@ -501,7 +500,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 	}
     
 	
-	@RequestMapping(value = "/e-parrot/models/add", method = { RequestMethod.POST, RequestMethod.GET })
+	@RequestMapping(value = "/e-parrot/addmodels", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> addModel(
 			HttpServletRequest request, 
 			@RequestParam(value = "modelName", required = false) String modelName,
@@ -549,7 +548,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 		}
 	}
 	
-	@RequestMapping(value = "/e-parrot/models/list", method = { RequestMethod.POST, RequestMethod.GET })
+	@RequestMapping(value = "/e-parrot/listmodels", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> getModelsList(
 			HttpServletRequest request, 
             @RequestBody(required = false) String postBody) throws Exception {
