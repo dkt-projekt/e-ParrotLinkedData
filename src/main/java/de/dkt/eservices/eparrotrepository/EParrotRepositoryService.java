@@ -84,7 +84,7 @@ public class EParrotRepositoryService {
 				mapaux.put("models", m.getModels());
 				mapaux.put("mode", m.getMode());
 			}
-			else if(type.equalsIgnoreCase("temp")){
+			else if(type.equalsIgnoreCase("timex")){
 				mapaux.put("analysis", m.getAnalysis());
 				mapaux.put("language", m.getLanguage());
 				mapaux.put("models", m.getModels());

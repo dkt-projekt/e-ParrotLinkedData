@@ -78,6 +78,13 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		int userId = jdbcTemplateObject.queryForObject(SQL0, new IntegerMapper());
 		String SQL1 = "select collectionId id from Collections WHERE collectionName='"+collection+"'";
 		int collectionId = jdbcTemplateObject.queryForObject(SQL1, new IntegerMapper());
+		
+		if(annotatedContent==null){
+			annotatedContent="";
+		}
+		if(highlightedContent==null){
+			highlightedContent="";
+		}
 		String SQL = "insert into Documents (documentId, collectionId, userId, documentName, description, analysis, content, annotatedContent, highlightedContent) "
 				+ "values (NULL, ?, ?, ?, ?, ?, ?, ?, ?)";
 		jdbcTemplateObject.update( SQL, collectionId, userId, documentName, description, analysis, content, annotatedContent, highlightedContent);
