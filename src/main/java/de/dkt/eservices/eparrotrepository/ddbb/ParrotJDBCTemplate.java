@@ -59,11 +59,18 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 
 
 	public boolean updateCollection(String collectionName, String timelining, String geolocalization,String semanticexploration, String clustering, String documents) {
-		String SQL = "update Collections SET timelining='"+timelining+"', geolocalization='"+geolocalization+"', entitylinking='"+semanticexploration+"',"
-				+ " clustering='"+clustering+"', documents='"+documents+"' "
+//		String SQL = "update Collections SET timelining='"+timelining+"', geolocalization='"+geolocalization+"', entitylinking='"+semanticexploration+"',"
+//				+ " clustering='"+clustering+"', documents='"+documents+"' "
+//				+ " WHERE collectionName='"+collectionName+"'";
+		String SQL = "update Collections SET timelining=?, geolocalization=?, entitylinking=?, clustering=?, documents=? "
 				+ " WHERE collectionName='"+collectionName+"'";
+		timelining = (timelining==null)?"":timelining;
+		geolocalization = (geolocalization==null)?"":geolocalization;
+		semanticexploration = (semanticexploration==null)?"":semanticexploration;
+		clustering = (clustering==null)?"":clustering;
+		documents = (documents==null)?"":documents;
 		try{
-			jdbcTemplateObject.update( SQL );
+			jdbcTemplateObject.update(SQL , timelining, geolocalization, semanticexploration, clustering, documents);
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -182,18 +189,21 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	}
 
 	@Override
-	public List<Document> listDocumentsFromCollection(String collectionId) {
+	public List<Document> listDocumentsFromCollection(String collectionId, int limit) {
 		String SQL = "select * from Documents";
 		if(collectionId!=null){
 			SQL += " where ";
 			SQL += "collectionId='"+collectionId+"' ";
+		}
+		if(limit>0){
+			SQL += " LIMIT "+limit;
 		}
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
 		return docs;
 	}
 
 	@Override
-	public List<Document> listDocumentsFromCollectionByName(String collectionName) {
+	public List<Document> listDocumentsFromCollectionByName(String collectionName, int limit) {
 		String SQL = "select * from Collections where collectionName = ?";
 		List<Collection> col = jdbcTemplateObject.query(SQL, new Object[]{collectionName}, new CollectionMapper());
 		if(col.isEmpty()){
@@ -206,12 +216,15 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			SQL2 += " where ";
 			SQL2 += "collectionId='"+colId+"' ";
 		}
+		if(limit>0){
+			SQL2 += " LIMIT "+limit;
+		}
 		List <Document> docs = jdbcTemplateObject.query(SQL2, new DocumentMapper());
 		return docs;
 	}
 
 	@Override
-	public List<Document> listDocumentsFromUser(String user, String collectionId) {
+	public List<Document> listDocumentsFromUser(String user, String collectionId, int limit) {
 		if(user==null){
 			return null;
 		}
@@ -223,16 +236,15 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			SQL += " AND ";
 			SQL += "Collections.collectionId='"+collectionId+"' ";
 		}
-		System.out.println(SQL);
+		if(limit>0){
+			SQL += " LIMIT "+limit;
+		}
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
-		System.out.println();
-		System.out.println(docs.size());
-		System.out.println();
 		return docs;
 	}
 
 	@Override
-	public List<Document> listDocumentsFromUserByName(String user, String collectionName) {
+	public List<Document> listDocumentsFromUserByName(String user, String collectionName, int limit) {
 		if(user==null){
 			return null;
 		}
@@ -243,6 +255,9 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		if(collectionName!=null){
 			SQL += " AND ";
 			SQL += "Collections.collectionName='"+collectionName+"' ";
+		}
+		if(limit>0){
+			SQL += " LIMIT "+limit;
 		}
 		List <Document> docs = jdbcTemplateObject.query(SQL, new DocumentMapper());
 		return docs;
@@ -280,6 +295,7 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	public boolean checkCollectionPermission(String collectionName, String user) {
 		String SQL0 = "select collectionId id from Collections,Users WHERE Collections.collectionName='"+collectionName+"' AND "
 				+ "( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' )";
+		System.out.println(SQL0);
 		List<Integer> lu = jdbcTemplateObject.query(SQL0, new IntegerMapper());
 //		User u = jdbcTemplateObject.queryForObject(SQL0, new UserMapper());
 		if(lu.isEmpty()){

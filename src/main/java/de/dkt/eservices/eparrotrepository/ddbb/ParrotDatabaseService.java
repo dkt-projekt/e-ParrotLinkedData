@@ -127,14 +127,14 @@ public class ParrotDatabaseService {
     	}
 	}
 
-	public List<Document> listDocument(String collectionId,String userName) throws ExternalServiceFailedException {
+	public List<Document> listDocument(String collectionId,String userName, int limit) throws ExternalServiceFailedException {
         try {
         	if(userName==null){
-            	List<Document> list = parrotDAO.listDocumentsFromCollection(collectionId);
+            	List<Document> list = parrotDAO.listDocumentsFromCollection(collectionId, limit);
             	return list;
         	}
         	else{
-            	List<Document> list = parrotDAO.listDocumentsFromUser(userName, collectionId);
+            	List<Document> list = parrotDAO.listDocumentsFromUser(userName, collectionId, limit);
             	return list;
         	}
     	} catch (Exception e) {
@@ -144,14 +144,14 @@ public class ParrotDatabaseService {
     	}
 	}
 
-	public List<Document> listDocumentByName(String collectionName,String userName) throws ExternalServiceFailedException {
+	public List<Document> listDocumentByName(String collectionName,String userName,int limit) throws ExternalServiceFailedException {
         try {
         	if(userName==null){
-            	List<Document> list = parrotDAO.listDocumentsFromCollectionByName(collectionName);
+            	List<Document> list = parrotDAO.listDocumentsFromCollectionByName(collectionName, limit);
             	return list;
         	}
         	else{
-            	List<Document> list = parrotDAO.listDocumentsFromUserByName(userName, collectionName);
+            	List<Document> list = parrotDAO.listDocumentsFromUserByName(userName, collectionName, limit);
             	return list;
         	}
     	} catch (Exception e) {

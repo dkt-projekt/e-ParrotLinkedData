@@ -53,6 +53,8 @@ public class EParrotRepositoryService {
     
 	HashMap<String, HashMap<String,String>> map;
 	
+	int collectionOverviewLimit = 3;
+	
 //	@Autowired
 	public EParrotRepositoryService() {
 //		initializeModels();
@@ -91,10 +93,10 @@ public class EParrotRepositoryService {
 				mapaux.put("mode", m.getMode());
 			}
 			else if(type.equalsIgnoreCase("translate")){
-				mapaux.put("analysis", m.getAnalysis());
-				mapaux.put("language", m.getLanguage());
-				mapaux.put("models", m.getModels());
-				mapaux.put("mode", m.getMode());
+//				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("source-lang", m.getLanguage());
+				mapaux.put("target-lang", m.getModels());
+				mapaux.put("Content-type", m.getMode());
 			}
 			map.put(m.getModelName(), mapaux);
 		}
@@ -300,7 +302,7 @@ public class EParrotRepositoryService {
 	}
 	
 	public JSONObject listDocumentsJSON(String collectionName,String user,int limit){
-		List<Document> list = databaseService.listDocumentByName(collectionName, user);
+		List<Document> list = databaseService.listDocumentByName(collectionName, user, limit);
 		List<Document> list2 = new LinkedList<Document>();
 		if(limit>0){
 			int counter = 0;
@@ -343,32 +345,15 @@ public class EParrotRepositoryService {
 
 		content = aContent;
 		String annotatedContent= annotateDocument(aContent,analysis);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println(annotatedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
+//		System.out.println(annotatedContent);
 		String highlightedContent = highlighText(annotatedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println(highlightedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		
+//		System.out.println(highlightedContent);
 		
 		int docId = databaseService.storeDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
 //		System.out.println("Annotated2: " + annotatedContent);
 //		System.out.println("Highlighted: " + highlightedContent);
 
-		if(!updateCollection(collectionName)){
+		if(!updateCollection(collectionName, collectionOverviewLimit)){
 			logger.error("The collection has not been updated!!");
 		}
 		return docId;
@@ -384,29 +369,12 @@ public class EParrotRepositoryService {
 
 		content = aContent;
 		String annotatedContent= annotateDocument(aContent,analysis);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println(annotatedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
+//		System.out.println(annotatedContent);
 		String highlightedContent = highlighText(annotatedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println(highlightedContent);
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		System.out.println("************************************************************************************");
-		
+//		System.out.println(highlightedContent);
 		
 		boolean doc = databaseService.updateDocument(documentName, collectionName, user, documentDescription, analysis, content, annotatedContent, highlightedContent);
-		if(!updateCollection(collectionName)){
+		if(!updateCollection(collectionName, collectionOverviewLimit)){
 			logger.error("The collection has not been updated!!");
 		}
 		return doc;
@@ -422,17 +390,43 @@ public class EParrotRepositoryService {
 					HashMap<String,String> tempMap = map.get(an);
 	
 					try{
-						HttpResponse<String> response = Unirest.post(tempMap.get("url"))
-	//						.queryString("input", annotatedContent)
-							.queryString("analysis", tempMap.get("analysis"))
-							.queryString("language", tempMap.get("language"))
-							.queryString("models", tempMap.get("models"))
-							.queryString("informat", tempMap.get("informat"))
-							.queryString("outformat", tempMap.get("outformat"))
-							.queryString("mode", tempMap.get("mode"))
-							.body(annotatedContent)
-							.asString();
-	
+						HttpResponse<String> response =null;
+						String type = tempMap.get("type");
+						if(type.equalsIgnoreCase("ner")){
+							response = Unirest.post(tempMap.get("url"))
+		//						.queryString("input", annotatedContent)
+								.queryString("analysis", tempMap.get("analysis"))
+								.queryString("language", tempMap.get("language"))
+								.queryString("models", tempMap.get("models"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								.queryString("mode", tempMap.get("mode"))
+								.body(annotatedContent)
+								.asString();
+						}
+						else if(type.equalsIgnoreCase("translate")){
+							response = Unirest.post(tempMap.get("url"))
+		//						.queryString("input", annotatedContent)
+								//.queryString("analysis", tempMap.get("analysis"))
+								.queryString("source-lang", tempMap.get("source-lang"))
+								.queryString("target-lang", tempMap.get("target-lang"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								.queryString("Content-type", tempMap.get("Content-type"))
+								.body(annotatedContent)
+								.asString();
+						}
+						else{
+							response = Unirest.post(tempMap.get("url"))
+		//						.queryString("input", annotatedContent)
+								.queryString("analysis", tempMap.get("analysis"))
+								.queryString("language", tempMap.get("language"))
+								.queryString("models", tempMap.get("models"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								.body(annotatedContent)
+								.asString();
+						}
 						if(response.getStatus() == 200){
 							annotatedContent = response.getBody();
 						}
@@ -457,14 +451,14 @@ public class EParrotRepositoryService {
 		return annotatedContent;
 	}
 
-	public boolean updateCollection(String collectionName){
-		List<Document> docsList = databaseService.listDocumentByName(collectionName, null);
+	public boolean updateCollection(String collectionName, int limit){
+		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
 		
-		String timelining = doCollectionTimelining(collectionName,docsList);
-		String geolocalization = doCollectionGeolocalization(collectionName,docsList);
-		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList);
-		String clustering = doCollectionSemanticExploration(collectionName,docsList);
-		String documents = doCollectionDocumentsList(collectionName,docsList);
+		String timelining = doCollectionTimelining(collectionName,docsList,limit);
+		String geolocalization = doCollectionGeolocalization(collectionName,docsList,limit);
+		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList,limit);
+		String clustering = doCollectionSemanticExploration(collectionName,docsList,limit);
+		String documents = doCollectionDocumentsList(collectionName,docsList,limit);
 
 		System.out.println("TIMELINING: " + timelining);
 		System.out.println("GEO: " + geolocalization);
@@ -474,19 +468,27 @@ public class EParrotRepositoryService {
 		return databaseService.updateCollection(collectionName, timelining,geolocalization,semanticexploration,clustering,documents);
 	}
 
-	public String doCollectionTimelining(String collectionName, List<Document> docsList){
+	public String doCollectionTimelining(String collectionName, List<Document> docsList, int limit){
 		boolean addElements = false;
 		try{
+			if(limit==0){
+				limit=Integer.MAX_VALUE;
+			}
 			List<TimelinedElement> inputNIFModels = new LinkedList<TimelinedElement>();
+			int counter = 0;
 			for (Document d : docsList) {
 				Model m = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
 				TimeElementType type = TimeElementType.DOCUMENT;
 				String uri = NIFReader.extractDocumentURI(m);
 
 				String dateRange = NIFReader.extractMeanDateRange(m);
-				TimeExpressionRange temporalExpression = new TimeExpressionRange(dateRange);
-				TimelinedElement tle = new TimelinedElement(type, uri, temporalExpression, m);
-				inputNIFModels.add(tle);
+				System.out.println("-------DEBUG: "+dateRange);
+				if(!dateRange.contains("null") && (counter<limit) ){
+					TimeExpressionRange temporalExpression = new TimeExpressionRange(dateRange);
+					TimelinedElement tle = new TimelinedElement(type, uri, temporalExpression, m);
+					inputNIFModels.add(tle);
+					counter++;
+				}
 			}
 
 			List<TimelinedElement> outputNIFModels = Timelining.generateTimelineFromModels(inputNIFModels,addElements);
@@ -509,7 +511,9 @@ public class EParrotRepositoryService {
 				ir +=  "<div class=\"timeline-heading\">";
 				String docId = timelinedElement.uri;
 				String text = NIFReader.extractIsString(timelinedElement.model).substring(0, 35);
+				String tempExpression = timelinedElement.temporalExpression.toString();
 				ir +=  "<span class=\"label label-default\">"+docId+"</span>";
+				ir +=  "<span class=\"label label-info\">"+tempExpression+"</span>";
 				ir +=  "<small class=\"text-muted\">   "+text+"...</small>";
 				ir +=  "</div>";
 				ir +=  "</div>";
@@ -528,28 +532,59 @@ public class EParrotRepositoryService {
 		}
 	}
 
-	public String doCollectionGeolocalization(String collectionName, List<Document> docsList){
+	public String doCollectionGeolocalization(String collectionName, List<Document> docsList, int limit){
 		boolean addElements = false;
 		try{
+			if(limit==0){
+				limit = Integer.MAX_VALUE;
+			}
+			int counter=0;
 			List<GeolocalizedElement> inputNIFModels = new LinkedList<GeolocalizedElement>();
+			float meanLat = 0;
+			float meanLong = 0;
 			for (Document d : docsList) {
 				Model m = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
 				GeoElementType type = GeoElementType.DOCUMENT;
 				String uri = NIFReader.extractDocumentURI(m);
+				String positionRange = NIFReader.extractMeanPositionRange(m);
 
-				String dateRange = NIFReader.extractMeanDateRange(m);
-				Geolocation geolocationExpression = new Geolocation(dateRange);
-				GeolocalizedElement gle = new GeolocalizedElement(type, uri, geolocationExpression, m);
-				inputNIFModels.add(gle);
+
+				System.out.println("--DEBUG: positon: "+positionRange);
+				if(!positionRange.contains("null") && (counter<limit) ){
+					Geolocation geoExpression = new Geolocation(positionRange);
+					GeolocalizedElement gle = new GeolocalizedElement(type, uri, geoExpression, m);
+					
+					meanLat += Float.parseFloat(gle.geolocationExpression.latitude.toString());
+					meanLong += Float.parseFloat(gle.geolocationExpression.longitude.toString());
+					inputNIFModels.add(gle);
+					counter++;
+				}
+				
 			}
+			meanLat = meanLat/counter;
+			meanLong = meanLong/counter;
+//			List<GeolocalizedElement> outputNIFModels = Geolocalization.generateGeolocalizationFromModels(inputNIFModels,addElements);
+			List<GeolocalizedElement> outputNIFModels = inputNIFModels;
 
-			List<GeolocalizedElement> outputNIFModels = Geolocalization.generateGeolocalizationFromModels(inputNIFModels,addElements);
+			String output = ""
+            + "<div class=\"container2\">"
+            + "<div id=\"map-place\" style=\"width: 100%;height: 400px;margin: 0;padding: 1px;\"></div>"
+            + "</div>"
+            + "<script type=\"text/javascript\">"
+            + "var mymap = L.map('map-place').setView(["+meanLat+", "+meanLong+"], 8);"
 
-			String output = "var locations = [";
+            + "L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {"
+            + "    attribution: '&copy; <a href=\"http://osm.org/copyright\">OpenStreetMap</a> contributors'"
+            + "}).addTo(mymap);";
+
 			for (GeolocalizedElement gle: outputNIFModels) {
-				output += "["+gle.geolocationExpression.latitude+","+gle.geolocationExpression.longitude+",\""+gle.uri+"\"]";
+//				output += "["+gle.geolocationExpression.latitude+","+gle.geolocationExpression.longitude+",\""+gle.uri+"\"]";
+	            output += "L.marker(["+gle.geolocationExpression.latitude+", "+gle.geolocationExpression.longitude+"]).addTo(mymap)";
+	            output += "    .bindPopup('"+gle.uri+"')";
+	            output += "    //.openPopup();";
+	            output += "        ;";
 			}
-			output += "]";
+			output += "</script>";
 			return output;
 		}
 		catch(Exception e){
@@ -558,7 +593,11 @@ public class EParrotRepositoryService {
 			return "";
 		}	}
 
-	public String doCollectionSemanticExploration(String collectionName, List<Document> docsList){
+	public String doCollectionSemanticExploration(String collectionName, List<Document> docsList, int limit){
+		if(limit==0){
+			limit=Integer.MAX_VALUE;
+		}
+
 		//TODO
 		String output = "";
 		
@@ -598,8 +637,10 @@ public class EParrotRepositoryService {
 		return output;
 	}
 
-	public String doCollectionClustering(String collectionName, List<Document> docsList){
-
+	public String doCollectionClustering(String collectionName, List<Document> docsList, int limit){
+		if(limit==0){
+			limit=Integer.MAX_VALUE;
+		}
 		HashMap<String, List<SemanticEntity>> docsMap = new HashMap<String, List<SemanticEntity>>();
 		List<SemanticEntity> entities = new LinkedList<SemanticEntity>();
 		
@@ -661,7 +702,7 @@ public class EParrotRepositoryService {
 //		BufferedWriter bw = FileFactory.generateBufferedWriterInstance(systemTemporalPath+"", "utf-8", false);
 		HttpResponse<String> response = null;
 		try {
-			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-timelining/")
+			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-clustering/generateClusters")
 					.queryString("algorithm", "em")
 					.queryString("language", "en")
 					.body(arff)
@@ -691,9 +732,20 @@ public class EParrotRepositoryService {
 		}
 	}
 
-	public String doCollectionDocumentsList(String collectionName, List<Document> docsList){
+	public String doCollectionDocumentsList(String collectionName, List<Document> docsList, int limit){
 		String finalResult = "";
+		if(limit==0){
+			limit=Integer.MAX_VALUE;
+		}
+		int counter=0;
 		for (Document document : docsList) {
+			if(counter>=limit){
+				break;
+			}
+			String high = document.getHighlightedContent();
+			if(high.length()>197){
+				high = high.substring(0, 197)+"...";
+			}
 			String ir = "";
 			ir += ""
 				+ "<div class=\"row\">"
@@ -705,20 +757,21 @@ public class EParrotRepositoryService {
 				+ "<div class=\"panel-body\">"
 				+ "<div class=\"col-lg-12 col-md-6\">"
 				+ "<div class=\"row\">"
-				+ "<blockquote>"
-				+ "<p>"+document.getHighlightedContent()+"</p>"
-				+ "</blockquote>"
+//				+ "<blockquote>"
+				+ "<p>"+high+"</p>"
+//				+ "</blockquote>"
 				+ "</div>"
-				+ "<div class=\"row\">"
-				+ "<span class=\"label label-default\">Other</span>"
-				+ "<span class=\"label label-primary\">Temporal Expressions</span>"
-				+ "<span class=\"label label-success\">Person</span>"
-				+ "<span class=\"label label-info\">Location</span>"
-				+ "<span class=\"label label-warning\">Organization</span>"
-				//+ "<span class=\"label label-danger\"></span>"
-				+ "</div>"
+//				+ "<div class=\"row\">"
+//				+ "<span class=\"label label-default\">Other</span>"
+//				+ "<span class=\"label label-primary\">Temporal Expressions</span>"
+//				+ "<span class=\"label label-success\">Person</span>"
+//				+ "<span class=\"label label-info\">Organization</span>"
+//				+ "<span class=\"label label-warning\">Location</span>"
+//				//+ "<span class=\"label label-danger\"></span>"
+//				+ "</div>"
 				+ "</div> </div> </div> </div></div>";
 			finalResult += ir;
+			counter++;
 		}
 		return finalResult;
 	}
@@ -774,19 +827,19 @@ public class EParrotRepositoryService {
 				if(type.contains("Location")){
 					label = "label-warning";
 				}
-				else if(type.contains("Organization")){
+				else if(type.contains("Organisation")){
 					label = "label-info";
 				}
 				else if(type.contains("Person")){
 					label = "label-success";
 				}
-				else if(type.contains("Date")){
+				else if(type.contains("TemporalEntity")){
 					label = "label-primary";
 				}
 				else{
 					label = "label-default";
 				}
-				
+
 //				System.out.println("\toffset: "+offset+" INIT: "+init+" END: "+end+"  type:"+type);
 				
 				if(offset>init){

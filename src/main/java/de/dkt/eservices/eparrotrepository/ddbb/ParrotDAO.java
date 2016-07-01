@@ -50,13 +50,13 @@ public interface ParrotDAO {
 
 	public Document getDocument(String documentId);
 	
-	public List<Document> listDocumentsFromUser(String user, String collectionId);
+	public List<Document> listDocumentsFromUser(String user, String collectionId, int limit);
 
-	public List<Document> listDocumentsFromUserByName(String user, String collectionName);
+	public List<Document> listDocumentsFromUserByName(String user, String collectionName, int limit);
 
-	public List<Document> listDocumentsFromCollection(String collectionId);
+	public List<Document> listDocumentsFromCollection(String collectionId, int limit);
 	
-	public List<Document> listDocumentsFromCollectionByName(String collectionName);
+	public List<Document> listDocumentsFromCollectionByName(String collectionName, int limit);
 
 	public boolean checkDocumentPermission(String documentId, String documentName, String user);
 	
