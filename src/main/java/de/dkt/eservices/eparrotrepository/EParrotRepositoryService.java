@@ -581,7 +581,7 @@ public class EParrotRepositoryService {
 //				output += "["+gle.geolocationExpression.latitude+","+gle.geolocationExpression.longitude+",\""+gle.uri+"\"]";
 	            output += "L.marker(["+gle.geolocationExpression.latitude+", "+gle.geolocationExpression.longitude+"]).addTo(mymap)";
 	            output += "    .bindPopup('"+gle.uri+"')";
-	            output += "    //.openPopup();";
+//	            output += "    //.openPopup();";
 	            output += "        ;";
 			}
 			output += "</script>";
