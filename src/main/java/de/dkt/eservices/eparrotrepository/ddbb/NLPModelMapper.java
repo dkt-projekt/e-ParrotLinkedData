@@ -37,10 +37,10 @@ public class NLPModelMapper implements RowMapper<NLPModel> {
 			m.setMode(rs.getString("mode"));
 		}
 		else if(type.equalsIgnoreCase("translate")){
-			//			      m.set(rs.getString(""));
-			//			      m.set(rs.getString(""));
-			//			      m.set(rs.getString(""));
-
+			m.setAnalysis(rs.getString("analysis"));
+			m.setLanguage(rs.getString("language"));
+			m.setModels(rs.getString("models"));
+			m.setMode(rs.getString("mode"));
 		}
 		return m;
 	}
