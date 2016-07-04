@@ -13,20 +13,10 @@ public class Document {
 	protected String annotatedContent;
 	protected String highlightedContent;
 
+	protected String analysis;
+
 	public Document() {
 		super();
-	}
-
-	public Document(int documentId, int collectionId, String documentName, String description, String content,
-			String annotatedContent, String highlightedContent) {
-		super();
-		this.documentId = documentId;
-		this.collectionId = collectionId;
-		this.documentName = documentName;
-		this.description = description;
-		this.content = content;
-		this.annotatedContent = annotatedContent;
-		this.highlightedContent = highlightedContent;
 	}
 
 	public String getDescription() {
@@ -85,6 +75,14 @@ public class Document {
 		this.documentName = documentName;
 	}
 
+	public String getAnalysis() {
+		return analysis;
+	}
+
+	public void setAnalysis(String analysis) {
+		this.analysis = analysis;
+	}
+
 	public JSONObject getJSONObject(){
 		JSONObject resultJSON = new JSONObject();
 		resultJSON.put("documentId", documentId);
@@ -92,6 +90,7 @@ public class Document {
 		resultJSON.put("documentName", documentName);
 		resultJSON.put("documentId", documentId);
 		resultJSON.put("documentDescription", description);
+		resultJSON.put("analysis", analysis);
 		resultJSON.put("documentContent", content);
 		resultJSON.put("annotatedContent", annotatedContent);
 		resultJSON.put("highlightedContent", highlightedContent);

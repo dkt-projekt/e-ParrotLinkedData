@@ -285,13 +285,86 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 	public ResponseEntity<String> getCollectionOverview(
 			HttpServletRequest request, 
 			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "user", required = false) String userName,
 			@RequestParam(value = "limit", required = false, defaultValue="3") int limit,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			String jsonString = repositoryService.getCollectionOverview(collectionName, limit);
+			String jsonString = repositoryService.getCollectionOverview(collectionName, userName, limit);
 
 			HttpHeaders responseHeaders = new HttpHeaders();
 //			responseHeaders.add("Content-Type", RDFSerialization.JSON.name());
+			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
+
+	@RequestMapping(value = "/e-parrot/{collection}/timelining", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getCollectionTimelining(
+			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "user", required = false) String userName,
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String jsonString = repositoryService.getCollectionTimelining(collectionName, userName, limit);
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}	
+
+	@RequestMapping(value = "/e-parrot/{collection}/geolocalization", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getCollectionGeolocalization(
+			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "user", required = false) String userName,
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String jsonString = repositoryService.getCollectionGeolocalization(collectionName, userName, limit);
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}	
+	
+	@RequestMapping(value = "/e-parrot/{collection}/semanticexploration", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getCollectionSemanticExploration(
+			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "user", required = false) String userName,
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String jsonString = repositoryService.getCollectionSemanticExploration(collectionName, userName, limit);
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}	
+	
+	@RequestMapping(value = "/e-parrot/{collection}/clustering", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getCollectionClustering(
+			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+			@RequestParam(value = "user", required = false) String userName,
+			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String jsonString = repositoryService.getCollectionClustering(collectionName, userName, limit);
+			HttpHeaders responseHeaders = new HttpHeaders();
+			
+			System.out.println("---------------------------");
+			System.out.println(jsonString);
+			System.out.println("---------------------------");
 			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -472,7 +545,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestHeader(value = "Accept", required = false) String acceptHeader,
 			@RequestHeader(value = "Content-Type", required = false) String contentTypeHeader,
 
-			@PathVariable(value = "collection") String collectionName,
+			@PathVariable(value = "collectionName") String collectionName,
 			@RequestParam(value = "documentName", required = false) String documentName,
 			@RequestParam(value = "documentId", required = false) String documentId,
 			@RequestParam(value = "user", required = false) String user,

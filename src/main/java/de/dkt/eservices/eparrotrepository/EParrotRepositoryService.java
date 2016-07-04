@@ -1,5 +1,10 @@
 package de.dkt.eservices.eparrotrepository;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +13,9 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.metamodel.relational.CheckConstraint;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -319,16 +326,55 @@ public class EParrotRepositoryService {
 		}
 	}
 	
-	public String getCollectionOverview(String collectionId,int limit){
-		return getCollectionOverviewJSON(collectionId, limit).toString();
+	public String getCollectionOverview(String collectionName, String userName, int limit){
+		return getCollectionOverviewJSON(collectionName, userName, limit).toString();
 	}
 	
-	public JSONObject getCollectionOverviewJSON(String collectionName,int limit){
+	public JSONObject getCollectionOverviewJSON(String collectionName, String userName, int limit){
+		if(databaseService.checkCollectionPermision(collectionName, userName)){
+			return new JSONObject("{\"errormessage\":\"The user has not permission to access this collection\"}");
+		}
 		Collection collection = databaseService.getCollectionByName(collectionName);
 		JSONObject result = collection.getJSONObject();
 		return result;
 	}
 
+	public String getCollectionTimelining(String collectionName, String userName, int limit){
+		if(!databaseService.checkCollectionPermision(collectionName, userName)){
+			return "The user has not permission to access this collection";
+		}
+		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
+		String timelining = doCollectionTimelining(collectionName,docsList,limit);
+		return timelining;
+	}
+	
+	public String getCollectionGeolocalization(String collectionName,String userName, int limit){
+		if(!databaseService.checkCollectionPermision(collectionName, userName)){
+			return "The user has not permission to access this collection";
+		}
+		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
+		String geolocalization = doCollectionGeolocalization(collectionName,docsList,limit);
+		return geolocalization;
+	}
+	
+	public String getCollectionSemanticExploration(String collectionName,String userName, int limit){
+		if(!databaseService.checkCollectionPermision(collectionName, userName)){
+			return "The user has not permission to access this collection";
+		}
+		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
+		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList,limit);
+		return semanticexploration;
+	}
+	
+	public String getCollectionClustering(String collectionName,String userName, int limit){
+		if(!databaseService.checkCollectionPermision(collectionName, userName)){
+			return "The user has not permission to access this collection";
+		}
+		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
+		String clustering = doCollectionClustering(collectionName,docsList,limit);
+		return clustering;
+	}
+	
 	public int addDocumentToCollection(String collectionName, String user, String documentName, String documentDescription, String content, String aContent, String analysis) {
 		boolean access = databaseService.checkCollectionPermision(collectionName, user);
 		if(!access){
@@ -641,11 +687,13 @@ public class EParrotRepositoryService {
 		if(limit==0){
 			limit=Integer.MAX_VALUE;
 		}
-		HashMap<String, List<SemanticEntity>> docsMap = new HashMap<String, List<SemanticEntity>>();
+		HashMap<String, HashMap<SemanticEntity,Integer>> docsMap = new HashMap<String, HashMap<SemanticEntity,Integer>>();
 		List<SemanticEntity> entities = new LinkedList<SemanticEntity>();
 		
 		for (Document d : docsList) {
+//			System.out.println(d.getDocumentName());
 			List<SemanticEntity> list = new LinkedList<SemanticEntity>();
+			HashMap<SemanticEntity,Integer> entitiesMap = new HashMap<SemanticEntity,Integer>();
 			Model model;
 			try {
 				model = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
@@ -660,10 +708,17 @@ public class EParrotRepositoryService {
 				Map<String,String> kMap = map.get(k);
 				String anchorOf = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#anchorOf";
 				String taIdentRef = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
-				SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf),kMap.get(taIdentRef));
+//				System.out.println("\t\t" + kMap.get(anchorOf)+" <---> "+kMap.get(taIdentRef));
+				SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' '),kMap.get(taIdentRef));
+				if(entitiesMap.containsKey(se1)){
+					entitiesMap.put(se1, entitiesMap.get(se1)+1);
+				}
+				else{
+					entitiesMap.put(se1, 1);
+				}
 				list.add(se1);
 			}
-			docsMap.put(d.getDocumentName(), list);
+			docsMap.put(d.getDocumentName(), entitiesMap);
 			for (SemanticEntity se : list) {
 				if(!entities.contains(se)){
 					entities.add(se);
@@ -671,12 +726,10 @@ public class EParrotRepositoryService {
 			}
 		}
 		
-		//TODO search for the number appearances isntead of 1,0
-		
-		
 		//Generate headers for the file.
 		String arff = "@RELATION "+collectionName+"_Clustering\n";
 
+		arff += "@ATTRIBUTE DOCUMENT_NAME  STRING\n";
 		for (SemanticEntity se : entities) {
 			arff += "@ATTRIBUTE "+se.text.replace(' ', '_')+"  NUMERIC\n";
 		}
@@ -684,45 +737,85 @@ public class EParrotRepositoryService {
 		arff += "@DATA\n";
 		Set<String> docsKeys = docsMap.keySet();
 		for (String dk : docsKeys) {
-			String line = "";
-			
+			String line = dk+"";
+			HashMap<SemanticEntity, Integer> eMaps = docsMap.get(dk);
 			for (SemanticEntity se : entities) {
-				if(docsMap.get(dk).contains(se)){
-					line += ",1";
+				if(eMaps.containsKey(se)){
+					line += ","+eMaps.get(se);
 				}
 				else{
 					line += ",0";
 				}
 			}
-			//Substring added to delete the first ,
-			arff = line.substring(1)+"\n";
+			arff += line+"\n";
 		}
-//		//TODO Convert information into ARFF file.
 //		String systemTemporalPath = "";
+//		File temp;
+//		try {
+//			temp = File.createTempFile("temp-file-name", ".tmp");
+//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), "utf-8"));
+//			bw.write(arff);
+//			bw.close();
+//		} catch (IOException e1) {
+//			e1.printStackTrace();
+//			String msg = "Error at generating temporal file for storing ARFF data.";
+//			logger.error(msg);
+//			throw new ExternalServiceFailedException(msg);
+//		} 
 //		BufferedWriter bw = FileFactory.generateBufferedWriterInstance(systemTemporalPath+"", "utf-8", false);
 		HttpResponse<String> response = null;
-		try {
+		try {							
 			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-clustering/generateClusters")
-					.queryString("algorithm", "em")
-					.queryString("language", "en")
-					.body(arff)
-					.asString();
-		} catch (UnirestException e) {
+			.queryString("algorithm", "kmeans")
+			.queryString("language", "en")
+			//.field("file", new File("/tmp/file"))
+			.body(arff)
+			.asString();
+		} catch (Exception e) {
 			String msg = "Error at calling the clustering service for collection: "+collectionName;
 			logger.error(msg, e);
 			return null;
 		}
 
+		System.out.println(response.getStatus());
+		System.out.println(response.getBody());
+		
 		String result = null;
 		if(response.getStatus() == 200){
-			result = response.getBody();
+			JSONObject responseJSON = new JSONObject(response.getBody());
 			
+			result += "";
+			result += "<div class=\"pricing-table group\">";
+
 			
-			//TODO The result must be modified to adapt to the interface.
+			HashMap<String, HashMap<String, Double>> resultHash = new HashMap<String, HashMap<String, Double>>();
 			
-			
-			
-			
+			JSONObject results = responseJSON.getJSONObject("results");
+			JSONObject clusters = results.getJSONObject("clusters");
+				
+			for (Object clusterId : clusters.keySet()){
+				JSONObject cid = clusters.getJSONObject(clusterId.toString());
+				JSONObject entitiesLabels = cid.getJSONObject("entities");
+				HashMap<String, Double> innerMap = new HashMap<String, Double>();
+				result += "<div class=\"block personal fl\">";
+				result += "<h2 class=\"title\">"+clusterId.toString()+"</h2>";
+				result += "<ul class=\"features\">";
+				for (Object entity : entitiesLabels.keySet()){
+					JSONObject jEnt = entitiesLabels.getJSONObject(entity.toString());
+					Object label = jEnt.get("label");
+					Object meanVal = jEnt.get("meanValue");
+					innerMap.put(label.toString(), Double.parseDouble(meanVal.toString()));
+					
+					result += "<li>"+label.toString()+"</li>";
+				}
+				result += "</ul>";
+				result += "<div class=\"pt-footer\">";
+				result += "<p><span>_ _ _ </span></p>";
+				result += "</div>";
+				result += "</div>";
+				resultHash.put(clusterId.toString(), innerMap);
+			}
+			result += "</div>";
 			return result;
 		}
 		else{
@@ -863,6 +956,13 @@ public class EParrotRepositoryService {
 //				}
 			}
 			high = high + anno.substring(offset);
+			
+			String translated = NIFReader.extractITSRDFTarget(jena);
+			if(translated!=null){
+				high = high + "<div class=\"col-lg-1\"></div>";
+				high = high + "<div class=\"translateText col-lg-11 col-md-5 alert alert-danger\">";
+				high = high + "<span class=\"label label-default\">"+translated+"</div>";
+			}
 			return high;
 		}
 		catch(Exception e){
@@ -902,7 +1002,7 @@ public class EParrotRepositoryService {
 
 	public boolean deleteDocumentById(String documentId, String user) {
        	try{
-       		databaseService.deleteDocumentByName(documentId, user);
+       		databaseService.deleteDocumentById(documentId, user);
        		return true;
        	}
        	catch(Exception e){

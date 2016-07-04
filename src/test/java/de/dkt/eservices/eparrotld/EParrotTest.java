@@ -370,6 +370,22 @@ public class EParrotTest {
 //		
 //	}
 	
+	
+	@Test
+	public void test8_4_getCollectionClustering() throws UnirestException, IOException,Exception {
+		HttpResponse<String> response = request("CondatTest6/clustering")
+				.queryString("user", "jmschnei@gmail.com")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+//		String expectedDocuments = "{\"models\":{\"model4\":{\"modelName\":\"temp_en\",\"models\":\"englishDates\",\"informat\":\"turtle\",\"modelId\":4,\"language\":\"en\",\"modelType\":\"timex\",\"analysis\":\"temp\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model3\":{\"mode\":\"all\",\"modelName\":\"ner_PER_ORG_LOC_en_all\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":3,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model2\":{\"mode\":\"link\",\"modelName\":\"ner_PER_ORG_LOC_en_link\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":2,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model1\":{\"mode\":\"spot\",\"modelName\":\"ner_PER_ORG_LOC_en_spot\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":1,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"}}}";
+//		Assert.assertEquals(expectedDocuments,response.getBody());
+		String expectedDocuments = "";
+		Assert.assertEquals(expectedDocuments, response.getBody());
+	}
+
+	
+	
+	
 	@Test
 	public void test9_1_listModels() throws UnirestException, IOException,Exception {
 		HttpResponse<String> response = request("listmodels")

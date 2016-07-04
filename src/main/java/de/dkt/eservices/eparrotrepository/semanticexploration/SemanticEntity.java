@@ -27,4 +27,19 @@ public class SemanticEntity {
 		this.uri = uri;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof SemanticEntity){
+			SemanticEntity o = (SemanticEntity) obj;
+			if(text.equals(o.getText())){
+				if(uri==null && o.getUri()==null){
+					return true;
+				}
+				if(uri.equals(o.getUri())){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

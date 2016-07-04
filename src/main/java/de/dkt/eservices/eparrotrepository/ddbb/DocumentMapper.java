@@ -13,6 +13,7 @@ public class DocumentMapper implements RowMapper<Document> {
 		      doc.setCollectionId(rs.getInt("collectionId"));
 		      doc.setDocumentName(rs.getString("documentName"));
 		      doc.setDescription(rs.getString("description"));
+		      doc.setAnalysis(rs.getString("analysis"));
 		      doc.setContent(rs.getString("content"));
 		      doc.setAnnotatedContent(rs.getString("annotatedContent"));
 		      doc.setHighlightedContent(rs.getString("highlightedContent"));
