@@ -12,6 +12,8 @@ public interface ParrotDAO {
 	 * USERS methods
 	 ****************************************/
 	
+	public int updateUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password);
+
 	public int createUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password);
 
 	public User getUser(String email);

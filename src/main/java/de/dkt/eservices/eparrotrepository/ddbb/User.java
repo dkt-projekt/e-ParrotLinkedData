@@ -58,7 +58,7 @@ public class User {
 		resultJSON.put("id", userId);
 		resultJSON.put("email", email);
 		resultJSON.put("password", password);
-		resultJSON.put("name", name);
+		resultJSON.put("userName", name);
 		return resultJSON;
 	}
 	

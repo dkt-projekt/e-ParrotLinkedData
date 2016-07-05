@@ -23,6 +23,16 @@ public class ParrotDatabaseService {
 	public ParrotDatabaseService(){
 	}
 	
+	public int updateUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
+        try {
+        	return parrotDAO.updateUser(newUser, newPassword, newUserName, newUserRole, user, password);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+        	logger.error(e.getMessage());
+    		throw new ExternalServiceFailedException(e.getMessage());
+    	}
+	}
+	
 	public int storeUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
         try {
         	return parrotDAO.createUser(newUser, newPassword, newUserName, newUserRole, user, password);

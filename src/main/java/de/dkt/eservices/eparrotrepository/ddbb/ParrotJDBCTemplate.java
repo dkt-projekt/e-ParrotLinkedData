@@ -23,6 +23,36 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	}
 
 	@Override
+	public int updateUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) {
+		String SQL0 = "select * from Users WHERE user='"+user+"' and password=PASSWORD('"+password+"') and role='admin'";
+		List<User> lu = jdbcTemplateObject.query(SQL0, new UserMapper());
+//		User u = jdbcTemplateObject.queryForObject(SQL0, new UserMapper());
+//		System.out.println(u.getJSONObject().toString());
+		if(lu.isEmpty()){
+			return -2;
+		}
+		String SQL = "update Users set ";
+		if(newPassword!=null){
+			SQL += " password=PASSWORD('"+newPassword+"')";
+		}
+		if(newUserName!=null){
+			SQL += " name='"+newUserName+"'";
+		}
+		if(newUserRole!=null){
+			SQL += " role='"+newUserRole+"'";
+		}
+		SQL += " WHERE user='"+newUser+"'";
+		int rows = jdbcTemplateObject.update( SQL );
+		return rows;
+//		if(rows>0){
+//			return rows;
+//		}
+//		else{
+//			return -1;
+//		}
+	}
+
+	@Override
 	public int createUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) {
 		String SQL0 = "select * from Users WHERE user='"+user+"' and password=PASSWORD('"+password+"') and role='admin'";
 		List<User> lu = jdbcTemplateObject.query(SQL0, new UserMapper());
@@ -31,8 +61,8 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 		if(lu.isEmpty()){
 			return -2;
 		}
-//		String SQL = "insert into Users (userId,user, password, name, role) values (NULL,?, PASSWORD(?), ?, ?)";
-//		jdbcTemplateObject.update( SQL, newUser, newPassword, newUserName, newUserRole);
+		String SQL = "insert into Users (userId,user, password, name, role) values (NULL,?, PASSWORD(?), ?, ?)";
+		jdbcTemplateObject.update( SQL, newUser, newPassword, newUserName, newUserRole);
 		String SQL2 = "select MAX(userId) id FROM Users";
 		Integer i = jdbcTemplateObject.queryForObject(SQL2, new IntegerMapper());
 		return i;

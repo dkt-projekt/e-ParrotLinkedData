@@ -52,6 +52,60 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
     	return response;
 	}
 
+	@RequestMapping(value = "/e-parrot/getUserInformation", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> getUserInformation(
+			HttpServletRequest request, 
+			@RequestParam(value = "user", required = false) String userName,
+			@RequestParam(value = "password", required = false) String password,
+			@RequestParam(value = "accessKey", required = false) String accessKey,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String result = "";
+			if(!accessKey.equalsIgnoreCase("dkt2015$")){
+				result = "";
+			}
+			else{
+				result = repositoryService.getUserInformation(userName, password);
+			}
+			HttpHeaders responseHeaders = new HttpHeaders();
+//			responseHeaders.add("Content-Type", RDFSerialization.JSON.name());
+			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
+
+	@RequestMapping(value = "/e-parrot/modifyUser", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> modifyUser(
+			HttpServletRequest request, 
+			@RequestParam(value = "user", required = false) String user,
+			@RequestParam(value = "password", required = false) String password,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "accessKey", required = false) String accessKey,
+			@RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String result = "false";
+			if(accessKey.equalsIgnoreCase("dkt2015$")){
+				if(user!=null && !user.equalsIgnoreCase("") && 
+						password!=null && !password.equalsIgnoreCase("") && 
+						name!=null && !name.equalsIgnoreCase("")){
+					int i = repositoryService.modifyUser(user, password, name, "normal", "dktproject@gmail.com", "dktproject2016");
+					if(i>0){
+						result="true";
+					}
+				}
+			}
+			HttpHeaders responseHeaders = new HttpHeaders();
+			ResponseEntity<String> res = new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK); 
+			return res;
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
+
 
 	@RequestMapping(value = "/e-parrot/checkUser", method = { RequestMethod.POST, RequestMethod.GET})
  	public ResponseEntity<String> checkUser(

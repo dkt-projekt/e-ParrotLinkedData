@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.metamodel.relational.CheckConstraint;
@@ -24,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
 
 import de.dkt.common.niftools.NIFReader;
 import de.dkt.eservices.eparrotrepository.ddbb.Collection;
@@ -185,6 +188,15 @@ public class EParrotRepositoryService {
 		map.put("temp_en", mapaux);*/
 	}
 
+	public String getUserInformation(String userName, String userPassword){
+//		if(databaseService.checkUser(userName, userPassword)){
+//			return "{\"errormessage\":\"The user has not permission to access this information\"}";
+//		}
+		User user = databaseService.getUser(userName);
+		return user.getJSONObject().toString();
+	}
+	
+
 	public String listUsers(int limit){
 		return listUsersJSON(limit).toString();
 	}
@@ -294,6 +306,10 @@ public class EParrotRepositoryService {
 			obj.put("models", joModels);
 		}
 		return obj;		
+	}
+	
+	public int modifyUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
+		return databaseService.updateUser(newUser, newPassword, newUserName, newUserRole, user, password);
 	}
 	
 	public int createUser(String newUser, String newPassword, String newUserName, String newUserRole, String user, String password) throws ExternalServiceFailedException {
@@ -763,14 +779,24 @@ public class EParrotRepositoryService {
 //			throw new ExternalServiceFailedException(msg);
 //		} 
 //		BufferedWriter bw = FileFactory.generateBufferedWriterInstance(systemTemporalPath+"", "utf-8", false);
+		
+		System.out.println(arff);
+		
 		HttpResponse<String> response = null;
-		try {							
+		try {
+//			HttpResponse response = httpClient.execute(new HttpGet(URL));
+//			HttpEntity entity = response.getEntity();
+//			String responseString = EntityUtils.toString(entity, "UTF-8");
+//			System.out.println(responseString);
+			
+//			Unirest.setDefaultHeader("Content-Type", "text/plain; charset=utf-8");
 			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-clustering/generateClusters")
-			.queryString("algorithm", "kmeans")
+			.queryString("algorithm", "em")
 			.queryString("language", "en")
 			//.field("file", new File("/tmp/file"))
-			.body(arff)
-			.asString();
+			.body(arff).asString();
+
+			
 		} catch (Exception e) {
 			String msg = "Error at calling the clustering service for collection: "+collectionName;
 			logger.error(msg, e);
@@ -780,24 +806,54 @@ public class EParrotRepositoryService {
 		System.out.println(response.getStatus());
 		System.out.println(response.getBody());
 		
-		String result = null;
+		String result = "";
 		if(response.getStatus() == 200){
 			JSONObject responseJSON = new JSONObject(response.getBody());
 			
 			result += "";
 			result += "<div class=\"pricing-table group\">";
-
 			
 			HashMap<String, HashMap<String, Double>> resultHash = new HashMap<String, HashMap<String, Double>>();
 			
 			JSONObject results = responseJSON.getJSONObject("results");
 			JSONObject clusters = results.getJSONObject("clusters");
-				
+			int numberClusters = Integer.parseInt(results.get("numberClusters").toString());
+			if(numberClusters==-1){
+				numberClusters=1;
+			}
+			else{
+				if(limit<numberClusters){
+					numberClusters=limit;
+				}
+			}
+			int counter = 0;
 			for (Object clusterId : clusters.keySet()){
+				if(limit==counter){
+					break;
+				}
 				JSONObject cid = clusters.getJSONObject(clusterId.toString());
 				JSONObject entitiesLabels = cid.getJSONObject("entities");
 				HashMap<String, Double> innerMap = new HashMap<String, Double>();
-				result += "<div class=\"block personal fl\">";
+				
+				String color="personal";
+				switch (counter%5) {
+				case 0:
+					color = "business";
+					break;
+				case 1:
+					color = "professional";
+					break;
+				case 2:
+					color = "holidays";
+					break;
+				case 3:
+					color = "meeting";
+					break;
+				default:
+					color = "personal";
+					break;
+				}
+				result += "<div class=\"block "+color+" fl block"+numberClusters+"\">";
 				result += "<h2 class=\"title\">"+clusterId.toString()+"</h2>";
 				result += "<ul class=\"features\">";
 				for (Object entity : entitiesLabels.keySet()){
@@ -806,7 +862,7 @@ public class EParrotRepositoryService {
 					Object meanVal = jEnt.get("meanValue");
 					innerMap.put(label.toString(), Double.parseDouble(meanVal.toString()));
 					
-					result += "<li>"+label.toString()+"</li>";
+					result += "<li>"+label.toString().replace('_', ' ')+"</li>";
 				}
 				result += "</ul>";
 				result += "<div class=\"pt-footer\">";
@@ -814,6 +870,7 @@ public class EParrotRepositoryService {
 				result += "</div>";
 				result += "</div>";
 				resultHash.put(clusterId.toString(), innerMap);
+				counter++;
 			}
 			result += "</div>";
 			return result;
@@ -825,6 +882,8 @@ public class EParrotRepositoryService {
 		}
 	}
 
+
+	
 	public String doCollectionDocumentsList(String collectionName, List<Document> docsList, int limit){
 		String finalResult = "";
 		if(limit==0){
