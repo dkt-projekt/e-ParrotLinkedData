@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 
 import eu.freme.common.conversion.rdf.RDFConstants;
 import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
@@ -29,7 +30,6 @@ import eu.freme.common.conversion.rdf.RDFConversionService;
 import eu.freme.common.exception.BadRequestException;
 import eu.freme.common.rest.BaseRestController;
 import eu.freme.common.rest.NIFParameterSet;
-import scala.collection.parallel.ParIterableLike.Foreach;
 
 @RestController
 public class EParrotRepositoryServiceStandAlone extends BaseRestController{
@@ -238,6 +238,8 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@RequestBody(required = false) String postBody) throws Exception {
 
 		try {
+			String usage = "standard_Call";
+			
 			String result=null;
 			if(collectionId==null){
 				result = repositoryService.listCollections(user,limit);
@@ -268,11 +270,14 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 					result = "{}";
 				}
 			}
+			
+			sendFeedback(user, "usage", "", "ParrotRepository/listCollections", "", usage, "", "");
 			HttpHeaders responseHeaders = new HttpHeaders();
 //			responseHeaders.add("Content-Type", RDFSerialization.PLAINTEXT.name());
 			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			sendFeedback(user, "error", "", "", "", "ParrotRepository/listCollections_Error: "+e.getMessage(), "1001", "Exception: "+e.getClass());
 			throw e;
 		}
 	}
@@ -415,10 +420,6 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 		try {
 			String jsonString = repositoryService.getCollectionClustering(collectionName, userName, limit);
 			HttpHeaders responseHeaders = new HttpHeaders();
-			
-			System.out.println("---------------------------");
-			System.out.println(jsonString);
-			System.out.println("---------------------------");
 			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -688,4 +689,43 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			throw e;
 		}
 	}
+	
+	
+	public boolean sendFeedback(String user, String interactionType, String additionalInformation, String objectId,
+			String relevanceValue, String value, String errorId, String errorType){
+		/**
+		 * interactionType: feedback, usage, relevance, usage, general
+		 * 
+		 * ai = new UsageInformation(objectId, value);
+		 * ai = new ErrorInformation(errorId, errorType, value);
+		 * ai = new RelevanceInformation(relevanceValue, objectId);
+		 * ai = new GeneralInformation(additionalInformation);
+		 */
+		try{
+			HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-logging/storeLoggingInformation")
+					.queryString("serviceType", "database")
+					.queryString("feedbackServiceName", "serviceName")
+					.queryString("create", false)
+					.queryString("user", user)
+					.queryString("interactionType", interactionType)
+					.queryString("additionalInformation", additionalInformation)
+					.queryString("objectId", objectId)
+					.queryString("relevancevalue", relevanceValue)
+					.queryString("value", value)
+					.queryString("errorId", errorId)
+					.queryString("errorType", errorType)
+					//.body(annotatedContent)
+					.asString();
+			if(response.getStatus()!=200){
+				return false;
+			}
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			logger.error("Error storing feedback", e);
+			return false;
+		}
+		return true;
+	}
+	
 }
