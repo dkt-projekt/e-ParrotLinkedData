@@ -407,7 +407,7 @@ public class EParrotRepositoryService {
 //			throw new ExternalServiceFailedException(msg);
 //		}
 
-		content = aContent;
+		content = plainContent(aContent);
 		String annotatedContent= annotateDocument(aContent,analysis);
 //		System.out.println(annotatedContent);
 		String highlightedContent = highlighText(annotatedContent);
@@ -442,6 +442,18 @@ public class EParrotRepositoryService {
 			logger.error("The collection has not been updated!!");
 		}
 		return doc;
+	}
+
+	public String plainContent(String aContent) {
+		try{
+			Model model = NIFReader.extractModelFromTurtleString(aContent);
+			String result = NIFReader.extractIsString(model);
+			return result;
+		}
+		catch(Exception e){
+			logger.error("The plainContent cannot be extracted.",e);
+			return aContent;
+		}
 	}
 
 	public String annotateDocument(String aContent, String analysis) {
@@ -994,10 +1006,11 @@ public class EParrotRepositoryService {
 			high = high + anno.substring(offset);
 			
 			String translated = NIFReader.extractITSRDFTarget(jena);
+			String language = NIFReader.extractITSRDFTargetLanguage(jena);
 			if(translated!=null){
 				high = high + "<div class=\"col-lg-1\"></div>";
 				high = high + "<div class=\"translateText col-lg-11 col-md-5 alert alert-danger\">";
-				high = high + "<span class=\"label label-default\">"+translated+"</div>";
+				high = high + "<span class=\"label label-default\">"+language+"</span>"+translated+"</div>";
 			}
 			return high;
 		}

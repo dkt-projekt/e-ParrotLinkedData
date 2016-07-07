@@ -324,7 +324,7 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	@Override
 	public boolean checkCollectionPermission(String collectionName, String user) {
 		String SQL0 = "select collectionId id from Collections,Users WHERE Collections.collectionName='"+collectionName+"' AND "
-				+ "( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' )";
+				+ "( Collections.private='200' OR ( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' ) )";
 		System.out.println(SQL0);
 		List<Integer> lu = jdbcTemplateObject.query(SQL0, new IntegerMapper());
 //		User u = jdbcTemplateObject.queryForObject(SQL0, new UserMapper());
@@ -337,7 +337,7 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 	@Override
 	public boolean checkDocumentPermission(String documentId, String documentName, String user) {
 		String SQL0 = "select documentId id from Documents,Collections,Users WHERE Documents.collectionId=Collections.collectionId AND "
-				+ "( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' )";
+				+ "( Collections.private='200' OR ( ( Users.user='"+user+"' AND Collections.userId=Users.userId ) OR Collections.users LIKE '%"+user+"%' ) )";
 		if(documentId!=null){
 			SQL0 += " AND Documents.documentId='"+documentId+"'";
 		}

@@ -288,13 +288,29 @@ public class EParrotTest {
 				" With his ranks swelled by Italian troops and Spanish colonial soldiers from Morocco, Franco made another attempt to capture Madrid in January and February 1937, but again failed." + 
 				" On 21 February the League of Nations Non-Intervention Committee ban on foreign national volunteers went into effect. The large city of Málaga was taken on 8 February. On 7 March, the German Condor Legion" +  
 				" equipped with Heinkel He 51 biplanes arrived in Spain; on 26 April the Legion Bombed the town of Guernica, killing hundreds.";
-		HttpResponse<String> response = request("WikiWars/addDocument")
+		String input2 = 
+"	@prefix dktnif: <http://dkt.dfki.de/ontologies/nif#> ."
++ "		@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ."
++ "		@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> ."
++ "		@prefix itsrdf: <http://www.w3.org/2005/11/its/rdf#> ."
++ "		@prefix nif:   <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#> ."
++ "		@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> ."
++ ""
++ "		<http://dkt.dfki.de/documents/#char=0,2507>"
++ "		        a               nif:RFC5147String , nif:String , nif:Context ;"
++ "		        nif:beginIndex  \"0\"^^xsd:nonNegativeInteger ;"
++ "		        nif:endIndex    \"2507\"^^xsd:nonNegativeInteger ;"
++ "		        nif:isString    \"\\n[Datumsstempel: MAR 16 1942]\\n \\nMrs. Luise Mendelsohn\\nThe Alden\\n225 Central Park West\\nNew York City\\n[Absender]\\nThe Drake\\nLake Shore Drive\\nChicago\\n[Anmerkung: 1b, 21/III 42.]\\n\\nThe Drake\\nChicago\\nIII.21.42.\\n\\nThe flowers came and your\\nletter, and I feel not totally\\ncut off from where I came and\\nshall go back to. They deserve a\\nspecial reply tomorrow. -\\nAfter a very lively luncheon\\nwith Prof. Lorch and family at\\nAnn Arbor I streamlined to\\nChicago into the Drake fossil. The\\ntechnical details I admired 18\\nyears ago have become either\\nloose or dusty and the seclusive\\nrefinement has made place a\\n\\nhumdrum of incentives for\\nlady-battleships or pre-war jeunesse-\\nchromée. \\nI had oyster dinner with Mies\\nand later at his flat much serious\\ntalk and laughter. Hilbersheimer\\ncame joining us.\\nMy lecture at Mies&apos;s department,\\nfor students only, was tremendously\\ncheered and Mies regretted not having\\ninvited the architects and the public.\\nDinner at a Greek Restaurant, invited\\nby Hilbersh. \\nToday, I went to the Arts Club, where\\nin the \\\"Wrigley\\\" Bldg. my work refuses\\nto be chewed, a posthumous sight for\\nme and an unborn for Chicago.\\nMet a French (Baronesse of course)\\ninfected by Jenny de Margerie with\\nMendelsohnitis,\\n\\nand the Lady President of the Club\\nlooking like a cluster of overpainted\\ntoo late autumn apples.\\nBadly hung and no critics. Sealed\\nlips because of unopened brass-heads. \\nThen, the Sulzbergers came. Too rich as\\nnot to be conceated. They don&apos;t think\\nthat modern Architecture and World Wars\\nhave any connection or George III any\\nwith war reverses!\\nI think to cancel their invitation for\\nsupper tomorrow night - 7 miles bus-\\nride for, certainly, cold meat.\\nIn an hour&apos;s time, Cocktail Party\\nat Mies - apparently for Bach, no\\nMass or remembrance visible.\\nAfter that my counter invitation for\\ndinner - Mies and friend. Did&apos;nt see\\nher yet:\\n\\nMonday night - Marc gentlemen\\nDinner.\\nTuesday night - Dinner &amp; Lecture\\nof the Institute within my exhibition.\\nAn embar[r]assing background.\\nWednesday to Ann Arbor - 2nd lecture\\non Thursday.\\nThursday night, may be Dinner with\\nAlbert Kahn&apos;s in Detroit and Friday\\nmorning to New York. There is, of course,\\na day train and Plant&apos;s office has\\njust wasted money. Nevertheless,\\nyour spring costume is certain.\\nWeather in Chicago changes from\\nlate spring to deep winter. I am\\ntranspiring and caughing.\\nAn impossible climate, a depressing\\nvista to my sensitive eyes - a world\\nuntouched by a 30 years fight! Mr. benedicted\\nby\\nBenedictus\"^^xsd:string ;"
++ "		        nif:language    \"en\"^^xsd:string .";
+
+//		HttpResponse<String> response = request("collection20160707171608/addDocument")
+				HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-parrot/collection20160707171608/addDocument")
 				.queryString("documentName", "8"+(new Date()).getTime())
 				.queryString("documentDescription", "")
-				.queryString("user", "jmschnei@gmail.com")
+				.queryString("user", "hh@hh.hh")
 				.queryString("format", "")
-				.queryString("informat", "text")
-				.queryString("input", input)
+				.queryString("informat", "turtle")
+				.queryString("input", input2)
 //				.queryString("path", "")
 				.queryString("analysis", "ner_PER_ORG_LOC_en_all,temp_en")
 				.asString();
