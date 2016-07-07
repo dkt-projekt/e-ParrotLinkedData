@@ -270,6 +270,29 @@ public class EParrotTest {
 	}
 	
 	@Test
+	public void test5_2_2_CreateDocument() throws UnirestException, IOException,Exception {
+		String input = "" + 
+				"1937\n" + 
+				" With his ranks swelled by Italian troops and Spanish colonial soldiers from Morocco, Franco made another attempt to capture Madrid in January and February 1937, but again failed." + 
+				" On 21 February the League of Nations Non-Intervention Committee ban on foreign national volunteers went into effect. The large city of Málaga was taken on 8 February. On 7 March, the German Condor Legion" +  
+				" equipped with Heinkel He 51 biplanes arrived in Spain; on 26 April the Legion Bombed the town of Guernica, killing hundreds.";
+		HttpResponse<String> response = request("WikiWars/addDocument")
+				.queryString("documentName", "8"+(new Date()).getTime())
+				.queryString("documentDescription", "")
+				.queryString("user", "jmschnei@gmail.com")
+				.queryString("format", "")
+				.queryString("informat", "text")
+				.queryString("input", input)
+//				.queryString("path", "")
+				.queryString("analysis", "ner_PER_ORG_LOC_en_all,temp_en")
+				.asString();
+		assertTrue(response.getStatus() == 200);
+		Assert.assertTrue(response.getBody().contains("successfully"));
+	}
+	
+	
+	 
+	@Test
 	public void test5_3_ListDocuments() throws UnirestException, IOException,Exception {
 		HttpResponse<String> response = request("collection1/listDocuments")
 				.queryString("user", "jmschnei@gmail.com")

@@ -14,9 +14,11 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.activemq.filter.function.replaceFunction;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.crsh.shell.impl.command.system.repl;
 import org.hibernate.metamodel.relational.CheckConstraint;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -522,11 +524,11 @@ public class EParrotRepositoryService {
 		String clustering = doCollectionClustering(collectionName,docsList,limit);
 		String documents = doCollectionDocumentsList(collectionName,docsList,limit);
 
-//		System.out.println("TIMELINING: " + timelining);
-//		System.out.println("GEO: " + geolocalization);
-//		System.out.println("Semantic: " + semanticexploration);
-//		System.out.println("Clustering: " + clustering);
-//		System.out.println("DOCUMENTS: " + documents);
+		System.out.println("TIMELINING: " + timelining);
+		System.out.println("GEO: " + geolocalization);
+		System.out.println("Semantic: " + semanticexploration);
+		System.out.println("Clustering: " + clustering);
+		System.out.println("DOCUMENTS: " + documents);
 		return databaseService.updateCollection(collectionName, timelining,geolocalization,semanticexploration,clustering,documents);
 	}
 
@@ -724,8 +726,8 @@ public class EParrotRepositoryService {
 				Map<String,String> kMap = map.get(k);
 				String anchorOf = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#anchorOf";
 				String taIdentRef = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
-//				System.out.println("\t\t" + kMap.get(anchorOf)+" <---> "+kMap.get(taIdentRef));
-				SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' '),kMap.get(taIdentRef));
+				System.out.println("\t\t" + kMap.get(anchorOf)+" <---> "+kMap.get(taIdentRef));
+				SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' ').replace('\r', ' '),kMap.get(taIdentRef));
 				if(entitiesMap.containsKey(se1)){
 					entitiesMap.put(se1, entitiesMap.get(se1)+1);
 				}
@@ -765,12 +767,14 @@ public class EParrotRepositoryService {
 			}
 			arff += line+"\n";
 		}
-//		System.out.println(arff);
+		System.out.println("-------------------------------");
+		System.out.println(arff);
+		System.out.println("-------------------------------");
 		
 		HttpResponse<String> response = null;
 		try {
 			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-clustering/generateClusters")
-			.queryString("algorithm", "em")
+			.queryString("algorithm", "kmeans")
 			.queryString("language", "en")
 			//.field("file", new File("/tmp/file"))
 			.body(arff).asString();
