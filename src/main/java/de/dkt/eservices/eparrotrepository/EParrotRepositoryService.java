@@ -519,14 +519,14 @@ public class EParrotRepositoryService {
 		String timelining = doCollectionTimelining(collectionName,docsList,limit);
 		String geolocalization = doCollectionGeolocalization(collectionName,docsList,limit);
 		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList,limit);
-		String clustering = doCollectionSemanticExploration(collectionName,docsList,limit);
+		String clustering = doCollectionClustering(collectionName,docsList,limit);
 		String documents = doCollectionDocumentsList(collectionName,docsList,limit);
 
-		System.out.println("TIMELINING: " + timelining);
-		System.out.println("GEO: " + geolocalization);
-		System.out.println("Semantic: " + semanticexploration);
-		System.out.println("Clustering: " + clustering);
-		System.out.println("DOCUMENTS: " + documents);
+//		System.out.println("TIMELINING: " + timelining);
+//		System.out.println("GEO: " + geolocalization);
+//		System.out.println("Semantic: " + semanticexploration);
+//		System.out.println("Clustering: " + clustering);
+//		System.out.println("DOCUMENTS: " + documents);
 		return databaseService.updateCollection(collectionName, timelining,geolocalization,semanticexploration,clustering,documents);
 	}
 
@@ -765,47 +765,22 @@ public class EParrotRepositoryService {
 			}
 			arff += line+"\n";
 		}
-//		String systemTemporalPath = "";
-//		File temp;
-//		try {
-//			temp = File.createTempFile("temp-file-name", ".tmp");
-//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), "utf-8"));
-//			bw.write(arff);
-//			bw.close();
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//			String msg = "Error at generating temporal file for storing ARFF data.";
-//			logger.error(msg);
-//			throw new ExternalServiceFailedException(msg);
-//		} 
-//		BufferedWriter bw = FileFactory.generateBufferedWriterInstance(systemTemporalPath+"", "utf-8", false);
-		
-		System.out.println(arff);
+//		System.out.println(arff);
 		
 		HttpResponse<String> response = null;
 		try {
-//			HttpResponse response = httpClient.execute(new HttpGet(URL));
-//			HttpEntity entity = response.getEntity();
-//			String responseString = EntityUtils.toString(entity, "UTF-8");
-//			System.out.println(responseString);
-			
-//			Unirest.setDefaultHeader("Content-Type", "text/plain; charset=utf-8");
 			response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-clustering/generateClusters")
 			.queryString("algorithm", "em")
 			.queryString("language", "en")
 			//.field("file", new File("/tmp/file"))
 			.body(arff).asString();
-
-			
 		} catch (Exception e) {
 			String msg = "Error at calling the clustering service for collection: "+collectionName;
 			logger.error(msg, e);
 			return null;
 		}
-
-		System.out.println(response.getStatus());
-		System.out.println(response.getBody());
-		
+//		System.out.println(response.getStatus());
+//		System.out.println(response.getBody());
 		String result = "";
 		if(response.getStatus() == 200){
 			JSONObject responseJSON = new JSONObject(response.getBody());
@@ -881,8 +856,6 @@ public class EParrotRepositoryService {
 			return null;
 		}
 	}
-
-
 	
 	public String doCollectionDocumentsList(String collectionName, List<Document> docsList, int limit){
 		String finalResult = "";
