@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -168,6 +170,16 @@ public class EParrotTest {
 				.asString();
 		assertTrue(response.getStatus() == 200);
 		
+		JSONObject j = new JSONObject(response.getBody());
+		JSONObject cols = j.getJSONObject("collections");
+		Iterator it = cols.keys();
+		int cnt = 0;
+		while(it.hasNext()){
+			Object o = it.next();
+			cnt++;
+		}
+		System.out.println(cnt);
+		System.exit(0);
 		Assert.assertEquals("{\"collections\":{\"collection1\":{\"entitylinking\":\"\",\"private\":false,\"documents\":\"<div class=\\\"row\\\"><div class=\\\"col-lg-12\\\"><div class=\\\"panel panel-default\\\"><div class=\\\"panel-heading\\\"><i class=\\\"fa fa-bar-chart-o fa-fw\\\"><\\/i> document1Plaintext<\\/div><div class=\\\"panel-body\\\"><div class=\\\"col-lg-12 col-md-6\\\"><div class=\\\"row\\\"><blockquote><p>1936\\n\\nCoup leader Sanjurjo was killed in a plane crash on 20 July, leaving an effective command split between Mola in the North and Franco in the <span class=\\\"label label-warning\\\">South<\\/span>. On 21 July, the fifth day of the rebellion, the Nationalists captured the main Spanish naval base at <span class=\\\"label label-warning\\\">Ferrol<\\/span> in northwestern <span class=\\\"label label-warning\\\">Spain<\\/span>. A rebel force under Colonel Beorlegui Canet, sent by General Emilio Mola, undertook the Campaign of Guipúzcoa from July to September. The capture of Guipúzcoa isolated the Republican provinces in the north. On 5 September, after heavy fighting the force took Irún, closing the French border to the Republicans. On 13 September, the Basques surrendered <span class=\\\"label label-warning\\\">San Sebastián<\\/span> to the Nationalists, who then advanced toward their capital, <span class=\\\"label label-warning\\\">Bilbao<\\/span>. The Republican militias on the border of Viscaya halted these forces at the end of September.\\n<\\/p><\\/blockquote><\\/div><div class=\\\"row\\\"><span class=\\\"label label-default\\\">Other<\\/span><span class=\\\"label label-primary\\\">Temporal Expressions<\\/span><span class=\\\"label label-success\\\">Person<\\/span><span class=\\\"label label-info\\\">Location<\\/span><span class=\\\"label label-warning\\\">Organization<\\/span><\\/div><\\/div> <\\/div> <\\/div> <\\/div><\\/div><div class=\\\"row\\\"><div class=\\\"col-lg-12\\\"><div class=\\\"panel panel-default\\\"><div class=\\\"panel-heading\\\"><i class=\\\"fa fa-bar-chart-o fa-fw\\\"><\\/i> document1Turtle<\\/div><div class=\\\"panel-body\\\"><div class=\\\"col-lg-12 col-md-6\\\"><div class=\\\"row\\\"><blockquote><p>1936\\n\\nCoup leader Sanjurjo was killed in a plane crash on 20 July, leaving an effective command split between Mola in the North and Franco in the <span class=\\\"label label-warning\\\">South<\\/span>. On 21 July, the fifth day of the rebellion, the Nationalists captured the main Spanish naval base at <span class=\\\"label label-warning\\\">Ferrol<\\/span> in northwestern <span class=\\\"label label-warning\\\">Spain<\\/span>. A rebel force under Colonel Beorlegui Canet, sent by General Emilio Mola, undertook the Campaign of Guipúzcoa from July to September. The capture of Guipúzcoa isolated the Republican provinces in the north. On 5 September, after heavy fighting the force took Irún, closing the French border to the Republicans. On 13 September, the Basques surrendered <span class=\\\"label label-warning\\\">San Sebastián<\\/span> to the Nationalists, who then advanced toward their capital, <span class=\\\"label label-warning\\\">Bilbao<\\/span>. The Republican militias on the border of Viscaya halted these forces at the end of September.\\n<\\/p><\\/blockquote><\\/div><div class=\\\"row\\\"><span class=\\\"label label-default\\\">Other<\\/span><span class=\\\"label label-primary\\\">Temporal Expressions<\\/span><span class=\\\"label label-success\\\">Person<\\/span><span class=\\\"label label-info\\\">Location<\\/span><span class=\\\"label label-warning\\\">Organization<\\/span><\\/div><\\/div> <\\/div> <\\/div> <\\/div><\\/div>\",\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":1,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection1\"},\"collection2\":{\"entitylinking\":\"\",\"private\":false,\"documents\":\"\",\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":2,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection2\"},\"collection3\":{\"entitylinking\":\"\",\"private\":false,\"documents\":\"\",\"collectionDescription\":\"This is the description of the test collection 1\",\"timelining\":\"\",\"clustering\":\"\",\"geolocalization\":\"\",\"analysis\":\"ner\",\"collectionId\":3,\"userId\":1,\"users\":\"\",\"collectionName\":\"collection3\"}}}", response.getBody());
 
 		HttpResponse<String> response2 = request("listCollections/")

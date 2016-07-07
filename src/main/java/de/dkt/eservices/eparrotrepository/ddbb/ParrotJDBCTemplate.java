@@ -211,8 +211,8 @@ public class ParrotJDBCTemplate implements ParrotDAO{
 			if(users.isEmpty()){
 				return feedbacks;
 			}
-			SQL += " where ";
-			SQL += "userId='"+users.get(0)+"' ";
+			SQL += " WHERE private='200' OR ";
+			SQL += " ( userId='"+users.get(0)+"' OR users LIKE '%"+user+"%' )";
 		}
 		feedbacks = jdbcTemplateObject.query(SQL, new CollectionMapper());
 		return feedbacks;
