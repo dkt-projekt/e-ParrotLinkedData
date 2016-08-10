@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkt</groupId>
   <artifactId>e-ParrotLinkedData</artifactId>
-  <version>0.3</version>
+  <version>0.4-SNAPSHOT</version>
   <name>e-ParrotLinkedData</name>
   <description>DKT project</description>
   
