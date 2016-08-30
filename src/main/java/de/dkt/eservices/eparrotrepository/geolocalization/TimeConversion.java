@@ -43,7 +43,7 @@ public class TimeConversion {
         	for (Model m : listModels) {
 				JSONObject resultJSON = new JSONObject();
 				String uri = NIFReader.extractDocumentURI(m);
-				String nifContent = NIFReader.model2String(m, "TTL");
+				String nifContent = NIFReader.model2String(m, RDFSerialization.TURTLE);
 				resultJSON.put("docId", i+1);
 				resultJSON.put("docURI", uri);
 				resultJSON.put("content", nifContent);
@@ -89,7 +89,7 @@ public class TimeConversion {
 				JSONObject resultJSON = new JSONObject();
 				Model m = tle.model;
 				String uri = NIFReader.extractDocumentURI(m);
-				String nifContent = NIFReader.model2String(m, "TTL");
+				String nifContent = NIFReader.model2String(m, RDFSerialization.TURTLE);
 				resultJSON.put("resultId", i+1);
 				resultJSON.put("type", tle.type.name());
 				resultJSON.put("uri", uri);
