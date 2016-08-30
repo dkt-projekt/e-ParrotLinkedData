@@ -18,7 +18,7 @@
 
 	<context:component-scan base-package="de.dkt.eservices.eparrotrepository" />
 	
-	    
+<!-- 	    
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -26,5 +26,5 @@
 		<property name="username" value="dkt-db" />
 		<property name="password" value="tZWz:{*L'KpH" />
 	</bean>
-	
+	 -->
 </beans>
