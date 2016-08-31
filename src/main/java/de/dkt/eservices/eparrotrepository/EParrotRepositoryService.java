@@ -733,20 +733,22 @@ public class EParrotRepositoryService {
 				return null;
 			}
 			Map<String,Map<String,String>> map = NIFReader.extractEntitiesExtended(model);
-			Set<String> keyset = map.keySet();
-			for (String k : keyset) {
-				Map<String,String> kMap = map.get(k);
-				String anchorOf = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#anchorOf";
-				String taIdentRef = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
-				System.out.println("\t\t" + kMap.get(anchorOf)+" <---> "+kMap.get(taIdentRef));
-				SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' ').replace('\r', ' '),kMap.get(taIdentRef));
-				if(entitiesMap.containsKey(se1)){
-					entitiesMap.put(se1, entitiesMap.get(se1)+1);
+			if (!(map.isEmpty())){
+				Set<String> keyset = map.keySet();
+				for (String k : keyset) {
+					Map<String, String> kMap = map.get(k);
+					String anchorOf = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#anchorOf";
+					String taIdentRef = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
+					System.out.println("\t\t" + kMap.get(anchorOf) + " <---> " + kMap.get(taIdentRef));
+					SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' ').replace('\r', ' '),
+							kMap.get(taIdentRef));
+					if (entitiesMap.containsKey(se1)) {
+						entitiesMap.put(se1, entitiesMap.get(se1) + 1);
+					} else {
+						entitiesMap.put(se1, 1);
+					}
+					list.add(se1);
 				}
-				else{
-					entitiesMap.put(se1, 1);
-				}
-				list.add(se1);
 			}
 			docsMap.put(d.getDocumentName(), entitiesMap);
 			for (SemanticEntity se : list) {
