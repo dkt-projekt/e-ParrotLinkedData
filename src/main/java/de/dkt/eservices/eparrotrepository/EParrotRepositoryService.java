@@ -934,31 +934,34 @@ public class EParrotRepositoryService {
 			String endTag = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#endIndex";
 			String typeTag = "http://www.w3.org/2005/11/its/rdf#taClassRef";
 
-			Set<String> keys = map.keySet();
-			for (String k : keys) {
-//				System.out.println("Key: "+k);
-				Map<String,String> internalMap = map.get(k);
-				
-				int init = Integer.parseInt(internalMap.get(initTag));
-//				int end = Integer.parseInt(internalMap.get(endTag));
-				boolean added=false;
+			if (!(map.isEmpty())){
+				Set<String> keys = map.keySet();
+				for (String k : keys) {
+					// System.out.println("Key: "+k);
+					Map<String, String> internalMap = map.get(k);
 
-				for (int i=0;i<list.size() && !added;i++) {
-					Map<String,String> mapL = list.get(i);
-					int auxInit = Integer.parseInt(mapL.get(initTag));
-					if(init<auxInit){
-						added = true;
-						list.add(i, internalMap);
+					int init = Integer.parseInt(internalMap.get(initTag));
+					// int end = Integer.parseInt(internalMap.get(endTag));
+					boolean added = false;
+
+					for (int i = 0; i < list.size() && !added; i++) {
+						Map<String, String> mapL = list.get(i);
+						int auxInit = Integer.parseInt(mapL.get(initTag));
+						if (init < auxInit) {
+							added = true;
+							list.add(i, internalMap);
+						}
 					}
+
+					if (!added) {
+						list.add(internalMap);
+					}
+					// Set<String> kes2 = internalMap.keySet();
+					// for (String k2 : kes2) {
+					// System.out.println("\t" + k2 + " <--> " +
+					// internalMap.get(k2));
+					// }
 				}
-				
-				if(!added){
-					list.add(internalMap);
-				}
-//				Set<String> kes2 = internalMap.keySet();
-//				for (String k2 : kes2) {
-//					System.out.println("\t" + k2 + " <--> " + internalMap.get(k2));
-//				}
 			}
 			
 			int offset = 0;
