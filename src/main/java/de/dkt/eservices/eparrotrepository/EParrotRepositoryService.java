@@ -733,7 +733,7 @@ public class EParrotRepositoryService {
 				return null;
 			}
 			Map<String,Map<String,String>> map = NIFReader.extractEntitiesExtended(model);
-			if (!(map.isEmpty())){
+			if ( map != null && !(map.isEmpty())){
 				Set<String> keyset = map.keySet();
 				for (String k : keyset) {
 					Map<String, String> kMap = map.get(k);
@@ -934,7 +934,7 @@ public class EParrotRepositoryService {
 			String endTag = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#endIndex";
 			String typeTag = "http://www.w3.org/2005/11/its/rdf#taClassRef";
 
-			if (!(map.isEmpty())){
+			if (map != null && !map.isEmpty()){
 				Set<String> keys = map.keySet();
 				for (String k : keys) {
 					// System.out.println("Key: "+k);
@@ -1073,7 +1073,7 @@ public class EParrotRepositoryService {
 		if(type.equalsIgnoreCase("dict")){
 			Unirest.setTimeouts(10000, 10000000);
 			
-			name = name + "_OTHER";
+			//name = name + "_OTHER";
 			
 			try{
 				HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de/api/e-nlp/trainModel")

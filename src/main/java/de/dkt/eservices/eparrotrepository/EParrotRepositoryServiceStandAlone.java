@@ -51,7 +51,6 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
     	ResponseEntity<String> response = new ResponseEntity<String>("The restcontroller is working properly", responseHeaders, HttpStatus.OK);
     	return response;
 	}
-
 	@RequestMapping(value = "/e-parrot/getUserInformation", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> getUserInformation(
 			HttpServletRequest request, 
