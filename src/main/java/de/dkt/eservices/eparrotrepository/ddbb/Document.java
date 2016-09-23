@@ -2,6 +2,11 @@ package de.dkt.eservices.eparrotrepository.ddbb;
 
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
+import de.dkt.common.niftools.NIFReader;
+import eu.freme.common.conversion.rdf.RDFConstants.RDFSerialization;
+
 public class Document {
 
 	protected int documentId;
@@ -94,6 +99,14 @@ public class Document {
 		resultJSON.put("documentContent", content);
 		resultJSON.put("annotatedContent", annotatedContent);
 		resultJSON.put("highlightedContent", highlightedContent);
+//		resultJSON.put("sentimentValue", getSentimentValue(annotatedContent));
 		return resultJSON;
 	}
+	
+//	public double getSentimentValue(String content){
+//		Model m = NIFReader.extractModelFromFormatString(content, RDFSerialization.TURTLE);
+//		
+//		double value = NIFReader.
+//		return value;
+//	}
 }

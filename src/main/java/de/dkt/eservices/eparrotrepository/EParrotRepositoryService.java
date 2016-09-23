@@ -104,6 +104,12 @@ public class EParrotRepositoryService {
 				mapaux.put("models", m.getModels());
 				mapaux.put("mode", m.getMode());
 			}
+			else if(type.equalsIgnoreCase("sent")){
+				mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				mapaux.put("models", m.getModels());
+				mapaux.put("mode", m.getMode());
+			}
 			else if(type.equalsIgnoreCase("translate")){
 //				mapaux.put("analysis", m.getAnalysis());
 				mapaux.put("source-lang", m.getLanguage());
@@ -295,9 +301,9 @@ public class EParrotRepositoryService {
 			}
 			i++;
 		}
-		if(joCollections.length()>0){
+//		if(joCollections.length()>0){
 			obj.put("collections", joCollections);
-		}
+//		}
 		if(joDocuments.length()>0){
 			obj.put("documents", joDocuments);
 		}
@@ -484,8 +490,20 @@ public class EParrotRepositoryService {
 							response = Unirest.post(tempMap.get("url"))
 		//						.queryString("input", annotatedContent)
 								//.queryString("analysis", tempMap.get("analysis"))
-								.queryString("source-lang", tempMap.get("source-lang"))
-								.queryString("target-lang", tempMap.get("target-lang"))
+								.queryString("sentimentEngine", tempMap.get("models"))
+								.queryString("language", tempMap.get("language"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								//.queryString("Content-type", tempMap.get("Content-type"))
+								.body(annotatedContent)
+								.asString();
+						}
+						else if(type.equalsIgnoreCase("sent")){
+							response = Unirest.post(tempMap.get("url"))
+		//						.queryString("input", annotatedContent)
+								//.queryString("analysis", tempMap.get("analysis"))
+								.queryString("", tempMap.get(""))
+								.queryString("", tempMap.get("target-lang"))
 								.queryString("informat", tempMap.get("informat"))
 								.queryString("outformat", tempMap.get("outformat"))
 								.queryString("Content-type", tempMap.get("Content-type"))
