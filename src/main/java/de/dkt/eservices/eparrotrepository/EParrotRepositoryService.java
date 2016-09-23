@@ -732,17 +732,15 @@ public class EParrotRepositoryService {
 			if(limit==0){
 				limit=Integer.MAX_VALUE;
 			}
-			List<TimelinedElement> inputNIFModels = new LinkedList<TimelinedElement>();
-			int counter = 0;
 			List<JSONObject> joAll = new LinkedList<JSONObject>();
-
+			
 			int cnt = 0;
 			for (Document d : docsList) {
-				Model m = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
-				
+				//System.out.println("DEBUGGING progress:" + Integer.toString(cnt) + " of " + Integer.toString(docsList.size()));
 				String annModel = annotateDocument(d.getAnnotatedContent(), "coref_en");//, relationextraction_en
-				m = NIFReader.extractModelFromFormatString(annModel, RDFSerialization.TURTLE);
-				String jsonOutput = annotateDocument(d.getAnnotatedContent(), "relationextraction_en");
+				//Model m = NIFReader.extractModelFromFormatString(annModel, RDFSerialization.TURTLE);
+				String jsonOutput = annotateDocument(annModel, "relationextraction_en");
+				//System.out.println("DEBUGGIGN jsonOutput:" + jsonOutput);
 				joAll.add(new JSONObject(jsonOutput));
 				cnt++;
 			}
