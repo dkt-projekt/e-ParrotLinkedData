@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.crsh.shell.impl.command.system.repl;
 import org.hibernate.metamodel.relational.CheckConstraint;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,6 +42,7 @@ import de.dkt.eservices.eparrotrepository.geolocalization.GeolocalizedElement;
 import de.dkt.eservices.eparrotrepository.geolocalization.GeolocalizedElement.GeoElementType;
 import de.dkt.eservices.eparrotrepository.geolocalization.Geolocation;
 import de.dkt.eservices.eparrotrepository.semanticexploration.SemanticEntity;
+import de.dkt.eservices.eparrotrepository.semanticexploration.SemanticExploration;
 import de.dkt.eservices.eparrotrepository.timelining.TimeExpressionRange;
 import de.dkt.eservices.eparrotrepository.timelining.TimelinedElement;
 import de.dkt.eservices.eparrotrepository.timelining.TimelinedElement.TimeElementType;
@@ -109,6 +111,18 @@ public class EParrotRepositoryService {
 				mapaux.put("language", m.getLanguage());
 				mapaux.put("models", m.getModels());
 				mapaux.put("mode", m.getMode());
+			}
+			else if(type.equalsIgnoreCase("coref")){
+				//mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				//mapaux.put("models", m.getModels());
+				//mapaux.put("mode", m.getMode());
+			}
+			else if(type.equalsIgnoreCase("relExtract")){
+				//mapaux.put("analysis", m.getAnalysis());
+				mapaux.put("language", m.getLanguage());
+				//mapaux.put("models", m.getModels());
+				//mapaux.put("mode", m.getMode());
 			}
 			else if(type.equalsIgnoreCase("translate")){
 //				mapaux.put("analysis", m.getAnalysis());
@@ -510,6 +524,30 @@ public class EParrotRepositoryService {
 								.body(annotatedContent)
 								.asString();
 						}
+						else if(type.equalsIgnoreCase("coref")){
+							response = Unirest.post(tempMap.get("url"))
+								//.queryString("", tempMap.get(""))
+								//.queryString("", tempMap.get("target-lang"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								//.queryString("Content-type", tempMap.get("Content-type"))
+								.queryString("language", tempMap.get("language"))
+								.body(annotatedContent)
+								.asString();
+						}
+						else if(type.equalsIgnoreCase("relExtract")){
+							response = Unirest.post(tempMap.get("url"))
+		//						.queryString("input", annotatedContent)
+								//.queryString("analysis", tempMap.get("analysis"))
+								//.queryString("", tempMap.get(""))
+								//.queryString("", tempMap.get("target-lang"))
+								.queryString("informat", tempMap.get("informat"))
+								.queryString("outformat", tempMap.get("outformat"))
+								//.queryString("Content-type", tempMap.get("Content-type"))
+								.queryString("language", tempMap.get("language"))
+								.body(annotatedContent)
+								.asString();
+						}
 						else{
 							response = Unirest.post(tempMap.get("url"))
 		//						.queryString("input", annotatedContent)
@@ -688,47 +726,39 @@ public class EParrotRepositoryService {
 		}	}
 
 	public String doCollectionSemanticExploration(String collectionName, List<Document> docsList, int limit){
-		if(limit==0){
-			limit=Integer.MAX_VALUE;
-		}
-
-		//TODO
-		String output = "";
 		
-		/*
-		                                 <ul id="primaryNav" class="col3">
-                                        <li id="home"><a href="http://d-nb.info/gnd/11858071X">Eric Mendelsohn</a></li>
-                                        <li><a href="http://www.geonames.org/5128581">New York</a>
-                                                <ul>
-                                                        <li><a href="http://d-nb.info/gnd/128830751">Louise</a></li>
-                                                </ul>
-                                        </li>
-                                        <li><a href="http://d-nb.info/gnd/128830751">Louise</a>
-                                                <ul>
-                                                        <li><a href="http://www.geonames.org/4115551">Hudson</a>
-                                                                <ul>
-                                                                        <li><a href="http://www.geonames.org/5391959">San Francisco</a>
-                                                                        </li>
-                                                                        <li><a href="http://www.geonames.org/5114221">Croton</a></li>
-                                                                </ul>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                        <li><a href="http://www.geonames.org/5391959">San Francisco</a>
-                                                <ul>
-                                                        <li><a href="http://www.geonames.org/4115551">Hudson</a>
-                                                                <ul>
-                                                                        <li><a href="http://www.geonames.org/5114221">Croton</a>
-                                                                        </li>
-                                                                </ul>
-                                                        </li>
-                                                        <li><a href="http://dkt.dfki.de/ontologies/nif#date=19450101000000_19460101000000">1945</a>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                </ul>
-		 */
-		return output;
+		boolean addElements = false;
+		try{
+			if(limit==0){
+				limit=Integer.MAX_VALUE;
+			}
+			List<TimelinedElement> inputNIFModels = new LinkedList<TimelinedElement>();
+			int counter = 0;
+			List<JSONObject> joAll = new LinkedList<JSONObject>();
+
+			int cnt = 0;
+			for (Document d : docsList) {
+				Model m = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
+				
+				String annModel = annotateDocument(d.getAnnotatedContent(), "coref_en");//, relationextraction_en
+				m = NIFReader.extractModelFromFormatString(annModel, RDFSerialization.TURTLE);
+				String jsonOutput = annotateDocument(d.getAnnotatedContent(), "relationextraction_en");
+				joAll.add(new JSONObject(jsonOutput));
+				cnt++;
+			}
+
+			JSONObject jsonMap = SemanticExploration.aggregateRelations(joAll);
+			return jsonMap.toString(2);
+			
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			String msg = "Error at generating timelinig for collection: "+collectionName;
+			logger.error(msg);
+			return "";
+		}
+		
+		
 	}
 
 	public String doCollectionClustering(String collectionName, List<Document> docsList, int limit){
