@@ -364,9 +364,10 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 			@PathVariable(value = "collection") String collectionName,
 			@RequestParam(value = "user", required = false) String userName,
 			@RequestParam(value = "limit", required = false, defaultValue="0") int limit,
+			@RequestParam(value = "format", required = false, defaultValue="json") String format,
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
-			String jsonString = repositoryService.getCollectionTimelining(collectionName, userName, limit);
+			String jsonString = repositoryService.getCollectionTimelining(collectionName, userName, limit, format);
 			HttpHeaders responseHeaders = new HttpHeaders();
 			return new ResponseEntity<String>(jsonString, responseHeaders, HttpStatus.OK);
 		} catch (Exception e) {

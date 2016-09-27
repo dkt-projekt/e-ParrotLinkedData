@@ -2,8 +2,8 @@ package de.dkt.eservices.eparrotrepository.timelining;
 
 public class TimeExpressionRange implements Comparable{
 
-	TimeExpression initialTime;
-	TimeExpression finalTime;
+	public TimeExpression initialTime;
+	public TimeExpression finalTime;
 	
 	public TimeExpressionRange() {
 	}

@@ -377,13 +377,17 @@ public class EParrotRepositoryService {
 		return result;
 	}
 
-	public String getCollectionTimelining(String collectionName, String userName, int limit){
+	public String getCollectionTimelining(String collectionName, String userName, int limit, String format){
 		if(!databaseService.checkCollectionPermision(collectionName, userName)){
 			return "The user has not permission to access this collection";
 		}
 		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
-		String timelining = doCollectionTimelining(collectionName,docsList,limit);
-		return timelining;
+		if(format.equalsIgnoreCase("json")){
+			return doCollectionJSONTimelining(collectionName,docsList,limit);
+		}
+		else{
+			return doCollectionHTMLTimelining(collectionName, docsList, limit);
+		}
 	}
 	
 	public String getCollectionGeolocalization(String collectionName,String userName, int limit){
@@ -586,7 +590,7 @@ public class EParrotRepositoryService {
 	public boolean updateCollection(String collectionName, int limit){
 		List<Document> docsList = databaseService.listDocumentByName(collectionName, null,0);
 		
-		String timelining = doCollectionTimelining(collectionName,docsList,limit);
+		String timelining = doCollectionHTMLTimelining(collectionName,docsList,limit);
 		String geolocalization = doCollectionGeolocalization(collectionName,docsList,limit);
 		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList,limit);
 		String clustering = doCollectionClustering(collectionName,docsList,limit);
@@ -600,7 +604,84 @@ public class EParrotRepositoryService {
 		return databaseService.updateCollection(collectionName, timelining,geolocalization,semanticexploration,clustering,documents);
 	}
 
-	public String doCollectionTimelining(String collectionName, List<Document> docsList, int limit){
+	public String doCollectionJSONTimelining(String collectionName, List<Document> docsList, int limit){
+		boolean addElements = false;
+		try{
+			if(limit==0){
+				limit=Integer.MAX_VALUE;
+			}
+//			JSONObject mediaO = new JSONObject();
+//			mediaO.put("url", "//www.flickr.com/photos/tm_10001/2310475988/");
+//			mediaO.put("caption", "Whitney Houston performing on her My Love is Your Love Tour in Hamburg.");
+//			mediaO.put("credit", "flickr/<a href='http://www.flickr.com/photos/tm_10001/'>tm_10001</a>");
+
+			JSONObject mediaT = new JSONObject();
+			mediaT.put("headLine", collectionName);
+			mediaT.put("text", "<p>Timelining representation of the documents of the collection.</p>");
+
+			JSONObject titleObject = new JSONObject();
+//			titleObject.put("media", mediaO);
+			titleObject.put("text", mediaT);
+			
+			JSONArray eventsArray = new JSONArray();
+			
+			List<TimelinedElement> inputNIFModels = new LinkedList<TimelinedElement>();
+			int counter = 0;
+			for (Document d : docsList) {
+				Model m = NIFReader.extractModelFromFormatString(d.getAnnotatedContent(), RDFSerialization.TURTLE);
+				TimeElementType type = TimeElementType.DOCUMENT;
+				String uri = NIFReader.extractDocumentURI(m);
+
+				String dateRange = NIFReader.extractMeanDateRange(m);
+				System.out.println("-------DEBUG: "+dateRange);
+				if(!dateRange.contains("null") && (counter<limit) ){
+					TimeExpressionRange temporalExpression = new TimeExpressionRange(dateRange);
+					TimelinedElement tle = new TimelinedElement(type, uri, temporalExpression, m);
+					inputNIFModels.add(tle);
+
+//					JSONObject mediaODoc = new JSONObject();
+//					mediaODoc.put("url", "//www.flickr.com/photos/tm_10001/2310475988/");
+//					mediaODoc.put("caption", "Whitney Houston performing on her My Love is Your Love Tour in Hamburg.");
+//					mediaODoc.put("credit", "flickr/<a href='http://www.flickr.com/photos/tm_10001/'>tm_10001</a>");
+
+					JSONObject mediaTDoc = new JSONObject();
+					mediaTDoc.put("headLine", d.getDocumentName());
+					String docText = d.getContent();
+//					mediaTDoc.put("text", "<p>"+docText.substring(0, 250)+"...</p>");
+					mediaTDoc.put("text", "<p>" + org.json.simple.JSONObject.escape(docText.substring(0, 250)) + "</p>");
+
+					JSONObject mediaDDoc = new JSONObject();
+					mediaDDoc.put("day",temporalExpression.initialTime.text.substring(8, 10));
+					mediaDDoc.put("month",temporalExpression.initialTime.text.substring(5, 7));
+					mediaDDoc.put("year",temporalExpression.initialTime.text.substring(0, 4));
+//					System.out.println("----------------------------------------------------------------------");
+//					System.out.println(temporalExpression.initialTime.text.substring(0, 4));
+//					System.out.println(temporalExpression.initialTime.text.substring(5, 7));
+//					System.out.println(temporalExpression.initialTime.text.substring(8, 10));
+					JSONObject docObject = new JSONObject();
+//					docObject.put("media", mediaODoc);
+					docObject.put("text", mediaTDoc);
+					docObject.put("start_date", mediaDDoc);
+					
+					eventsArray.put(docObject);
+					counter++;
+				}
+			}
+			JSONObject obj = new JSONObject();
+			obj.put("title", titleObject);
+			obj.put("events", eventsArray);
+			return obj.toString();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			String msg = "Error at generating timelinig for collection: "+collectionName;
+			logger.error(msg);
+			return "";
+		}
+	}
+
+	
+	public String doCollectionHTMLTimelining(String collectionName, List<Document> docsList, int limit){
 		boolean addElements = false;
 		try{
 			if(limit==0){

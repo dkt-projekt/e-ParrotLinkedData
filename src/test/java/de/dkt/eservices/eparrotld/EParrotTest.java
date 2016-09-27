@@ -422,11 +422,27 @@ public class EParrotTest {
 ////	}
 //	
 //	
+//	@Test
+//	public void test8_4_getCollectionClustering() throws UnirestException, IOException,Exception {
+//		//HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de:8092/e-parrot/CondatTest6/clustering")
+//		HttpResponse<String> response = request("MiddleEastNewsCollection/clustering")
+//				.queryString("user", "dkt-project@dfki.de")
+//				.asString();
+//		assertTrue(response.getStatus() == 200);
+//		System.out.println("BBBBOOOODDDDDYYYY: "+response.getBody());
+////		String expectedDocuments = "{\"models\":{\"model4\":{\"modelName\":\"temp_en\",\"models\":\"englishDates\",\"informat\":\"turtle\",\"modelId\":4,\"language\":\"en\",\"modelType\":\"timex\",\"analysis\":\"temp\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model3\":{\"mode\":\"all\",\"modelName\":\"ner_PER_ORG_LOC_en_all\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":3,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model2\":{\"mode\":\"link\",\"modelName\":\"ner_PER_ORG_LOC_en_link\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":2,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"},\"model1\":{\"mode\":\"spot\",\"modelName\":\"ner_PER_ORG_LOC_en_spot\",\"models\":\"ner-wikinerEn_PER;ner-wikinerEn_ORG;ner-wikinerEn_LOC\",\"informat\":\"turtle\",\"modelId\":1,\"language\":\"en\",\"modelType\":\"ner\",\"analysis\":\"ner\",\"outformat\":\"turtle\",\"url\":\"/e-nlp/namedEntityRecognition\"}}}";
+////		Assert.assertEquals(expectedDocuments,response.getBody());
+//		String expectedDocuments = "";
+//		Assert.assertEquals(expectedDocuments, response.getBody());
+//		
+//	}
+//
 	@Test
-	public void test8_4_getCollectionClustering() throws UnirestException, IOException,Exception {
+	public void test8_5_getCollectionTimelining() throws UnirestException, IOException,Exception {
 		//HttpResponse<String> response = Unirest.post("http://dev.digitale-kuratierung.de:8092/e-parrot/CondatTest6/clustering")
-		HttpResponse<String> response = request("MiddleEastNewsCollection/clustering")
+		HttpResponse<String> response = request("MiddleEastNewsCollection/timelining")
 				.queryString("user", "dkt-project@dfki.de")
+				.queryString("limit", 3)
 				.asString();
 		assertTrue(response.getStatus() == 200);
 		System.out.println("BBBBOOOODDDDDYYYY: "+response.getBody());
@@ -436,7 +452,7 @@ public class EParrotTest {
 		Assert.assertEquals(expectedDocuments, response.getBody());
 		
 	}
-//
+
 //	
 //	
 //	

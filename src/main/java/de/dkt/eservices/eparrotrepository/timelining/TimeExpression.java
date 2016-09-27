@@ -2,7 +2,7 @@ package de.dkt.eservices.eparrotrepository.timelining;
 
 public class TimeExpression {
 
-	String text;
+	public String text;
 	
 	public TimeExpression() {
 		super();
