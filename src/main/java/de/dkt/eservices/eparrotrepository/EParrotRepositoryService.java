@@ -342,7 +342,7 @@ public class EParrotRepositoryService {
 		return databaseService.storeCollection(collectionName, user, description, priv, analysis, sUsers);
 	}
 	
-	public String listDocuments(String collectionName,String user,int limit){
+	public String listDocuments(String collectionName,String user,int limit, String interfaceName){
 		return listDocumentsJSON(collectionName, user, limit).toString();
 	}
 	
@@ -363,7 +363,7 @@ public class EParrotRepositoryService {
 			return convertListIntoJSON(list);
 		}
 	}
-	
+
 	public String getCollectionOverview(String collectionName, String userName, int limit){
 		return getCollectionOverviewJSON(collectionName, userName, limit).toString();
 	}
@@ -785,8 +785,11 @@ public class EParrotRepositoryService {
 					Map<String, String> kMap = map.get(k);
 					String anchorOf = "http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#anchorOf";
 					String taIdentRef = "http://www.w3.org/2005/11/its/rdf#taIdentRef";
-					System.out.println("\t\t" + kMap.get(anchorOf) + " <---> " + kMap.get(taIdentRef));
-					SemanticEntity se1 = new SemanticEntity(kMap.get(anchorOf).replace('\n', ' ').replace('\r', ' '),
+//					System.out.println("\t\t" + kMap.get(anchorOf) + " <---> " + kMap.get(taIdentRef));
+//					String anchorText = kMap.get(anchorOf).replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').replaceAll("\\s\\s", " ");
+					String anchorText = kMap.get(anchorOf)./*replace('\n', ' ').*/replace('\'', ' ').replace(',', '_').replaceAll("\\s+", " ");
+//					System.out.println(anchorText);
+					SemanticEntity se1 = new SemanticEntity(anchorText,
 							kMap.get(taIdentRef));
 					if (entitiesMap.containsKey(se1)) {
 						entitiesMap.put(se1, entitiesMap.get(se1) + 1);
@@ -827,9 +830,9 @@ public class EParrotRepositoryService {
 			}
 			arff += line+"\n";
 		}
-		System.out.println("-------------------------------");
-		System.out.println(arff);
-		System.out.println("-------------------------------");
+//		System.out.println("-------------------------------");
+//		System.out.println(arff);
+//		System.out.println("-------------------------------");
 		
 		HttpResponse<String> response = null;
 		try {

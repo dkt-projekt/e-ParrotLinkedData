@@ -32,12 +32,16 @@ public class SemanticEntity {
 		if(obj instanceof SemanticEntity){
 			SemanticEntity o = (SemanticEntity) obj;
 			if(text.equals(o.getText())){
-				if(uri==null && o.getUri()==null){
-					return true;
-				}
-				if(uri.equals(o.getUri())){
-					return true;
-				}
+//				if(uri==null && o.getUri()==null){
+//					return true;
+//				}
+//				if(uri==null || o.getUri()==null){
+//					return false;
+//				}
+//				if(uri.equals(o.getUri())){
+//					return true;
+//				}
+				return true;
 			}
 		}
 		return false;
