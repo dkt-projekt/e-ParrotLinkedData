@@ -513,7 +513,7 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
             @RequestBody(required = false) String postBody) throws Exception {
 		try {
 			String result;
-			if(repositoryService.updateCollection(collectionName, 0)){
+			if(repositoryService.updateCollection(collectionName, 5)){
 				result = "The collection "+collectionName+" has been successfully updated!!";
 			}
 			else{
