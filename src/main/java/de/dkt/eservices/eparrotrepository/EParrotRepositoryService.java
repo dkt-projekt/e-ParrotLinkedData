@@ -25,6 +25,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -707,34 +710,76 @@ public class EParrotRepositoryService {
 			List<TimelinedElement> outputNIFModels = Timelining.generateTimelineFromModels(inputNIFModels,addElements);
 //			JSONObject outputJSONObject = TimeConversion.generateJSONFromTimelinedElements(outputNIFModels);
 			
-			String output = ""
-			+ "<ul class=\"timeline\">";
-			int count = 0;
+			JSONObject mediaT = new JSONObject();
+			mediaT.put("headLine", collectionName);
+			mediaT.put("text", "<p>Timelining representation of the documents of the collection.</p>");
+
+			JSONObject titleObject = new JSONObject();
+//			titleObject.put("media", mediaO);
+			titleObject.put("text", mediaT);
+			
+			JSONArray eventsArray = new JSONArray();
+
+//			String output = ""
+//			+ "<ul class=\"timeline\">";
 
 			for (TimelinedElement timelinedElement : outputNIFModels) {
-				String ir = "";
-
-				if(count % 2 == 0){
-					ir += "<li>";
-				}
-				else{
-					ir += "<li class=\"timeline-inverted\">";
-				}
-				ir +=  "<div class=\"timeline-panel\">";
-				ir +=  "<div class=\"timeline-heading\">";
+//				String ir = "";
+//
+//				if(count % 2 == 0){
+//					ir += "<li>";
+//				}
+//				else{
+//					ir += "<li class=\"timeline-inverted\">";
+//				}
+//				ir +=  "<div class=\"timeline-panel\">";
+//				ir +=  "<div class=\"timeline-heading\">";
+//				String docId = timelinedElement.uri;
+//				String text = NIFReader.extractIsString(timelinedElement.model).substring(0, 35);
+//				String tempExpression = timelinedElement.temporalExpression.toString();
+//				ir +=  "<span class=\"label label-default\">"+docId+"</span>";
+//				ir +=  "<span class=\"label label-info\">"+tempExpression+"</span>";
+//				ir +=  "<small class=\"text-muted\">   "+text+"...</small>";
+//				ir +=  "</div>";
+//				ir +=  "</div>";
+//				ir +=  "</li>";
+//				output += ir;
 				String docId = timelinedElement.uri;
 				String text = NIFReader.extractIsString(timelinedElement.model).substring(0, 35);
-				String tempExpression = timelinedElement.temporalExpression.toString();
-				ir +=  "<span class=\"label label-default\">"+docId+"</span>";
-				ir +=  "<span class=\"label label-info\">"+tempExpression+"</span>";
-				ir +=  "<small class=\"text-muted\">   "+text+"...</small>";
-				ir +=  "</div>";
-				ir +=  "</div>";
-				ir +=  "</li>";
-				output += ir;
-				count++;
+//				String tempExpression = timelinedElement.temporalExpression.toString();
+				String startdate = timelinedElement.temporalExpression.initialTime.text;
+				
+				JSONObject mediaTDoc = new JSONObject();
+				mediaTDoc.put("headLine", docId);
+				String docText = text;
+				//					mediaTDoc.put("text", "<p>"+docText.substring(0, 250)+"...</p>");
+				mediaTDoc.put("text", "<p>" + org.json.simple.JSONObject.escape(docText.substring(0, 250)) + "</p>");
+
+				JSONObject mediaDDoc = new JSONObject();
+				mediaDDoc.put("day",startdate.substring(8, 10));
+				mediaDDoc.put("month",startdate.substring(5, 7));
+				mediaDDoc.put("year",startdate.substring(0, 4));
+				JSONObject docObject = new JSONObject();
+				//					docObject.put("media", mediaODoc);
+				docObject.put("text", mediaTDoc);
+				docObject.put("start_date", mediaDDoc);
+
+				eventsArray.put(docObject);
+
 			}
-			output += "</ul>";
+			JSONObject obj = new JSONObject();
+			obj.put("title", titleObject);
+			obj.put("events", eventsArray);
+		    String output = "<div id='timeline-embed' style=\"width: 100%; height: 600px\"></div>";
+		    output += 
+	        "<script type=\"text/javascript\">\n" + 
+	        "var json = \"" + obj.toString() + "\" \n" + 
+	        "var timeline_json = JSON.parse(json);//make_the_json(); // you write this part\n" +
+	        "window.timeline = new TL.Timeline('timeline-embed', timeline_json);\n" + 
+	        "</script>\n" + 
+	        "</div>\n";
+
+//			output += "</ul>";
 			return output;
 		}
 		catch(Exception e){
@@ -844,6 +889,7 @@ public class EParrotRepositoryService {
 		if(limit==0){
 			limit=Integer.MAX_VALUE;
 		}
+		
 		HashMap<String, HashMap<SemanticEntity,Integer>> docsMap = new HashMap<String, HashMap<SemanticEntity,Integer>>();
 		List<SemanticEntity> entities = new LinkedList<SemanticEntity>();
 		
