@@ -595,7 +595,7 @@ public class EParrotRepositoryService {
 		
 		String timelining = doCollectionHTMLTimelining(collectionName,docsList,limit);
 		String geolocalization = doCollectionGeolocalization(collectionName,docsList,limit);
-		String semanticexploration = doCollectionSemanticExploration(collectionName,docsList,limit);
+		String semanticexploration = "";//doCollectionSemanticExploration(collectionName,docsList,limit);
 		String clustering = doCollectionClustering(collectionName,docsList,limit);
 		String documents = doCollectionDocumentsList(collectionName,docsList,limit);
 
