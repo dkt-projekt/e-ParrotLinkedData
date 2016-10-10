@@ -748,15 +748,20 @@ public class EParrotRepositoryService {
 				String text = NIFReader.extractIsString(timelinedElement.model).substring(0, 35);
 //				String tempExpression = timelinedElement.temporalExpression.toString();
 				String startdate = timelinedElement.temporalExpression.initialTime.text;
-				
+				System.out.println("=====================");
 				JSONObject mediaTDoc = new JSONObject();
 				mediaTDoc.put("headLine", docId);
-				String docText = org.json.simple.JSONObject.escape(text);
+				String docText = org.json.simple.JSONObject.escape(text);//.replaceAll("\\\\", "\\\\\\\\");//.replaceAll("\"", "\\\\\\\\\\\\\\\"");
 				//					mediaTDoc.put("text", "<p>"+docText.substring(0, 250)+"...</p>");
-				
+
+				System.out.println(org.json.simple.JSONObject.escape(text));
+				System.out.println(org.json.simple.JSONObject.escape(text));//.replaceAll("\\\\", "\\\\\\\\"));
 				String partText = (docText.length()>249) ? docText.substring(0, 250) : docText;
-				
+
+				System.out.println(partText);
 				mediaTDoc.put("text", "<p>" + partText + "</p>");
+
+				System.out.println("=====================");
 
 				JSONObject mediaDDoc = new JSONObject();
 				mediaDDoc.put("day",startdate.substring(8, 10));
@@ -776,7 +781,7 @@ public class EParrotRepositoryService {
 		    String output = "<div id='timeline-embed' style=\"height: 450px\"></div>";
 		    output += 
 	        "<script type=\"text/javascript\">\n" + 
-	        "var json = \"" + obj.toString().replaceAll("\"", "\\\\\"") + "\" \n" + 
+	        "var json = \"" + obj.toString().replaceAll("\\\\", "\\\\\\\\").replaceAll("\"", "\\\\\"") + "\" \n" + 
 	        "var timeline_json = JSON.parse(json);//make_the_json(); // you write this part\n" +
 	        "window.timeline = new TL.Timeline('timeline-embed', timeline_json);\n" + 
 	        "</script>\n";
