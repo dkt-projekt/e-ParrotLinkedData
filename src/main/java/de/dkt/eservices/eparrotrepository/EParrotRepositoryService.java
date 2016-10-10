@@ -751,9 +751,12 @@ public class EParrotRepositoryService {
 				
 				JSONObject mediaTDoc = new JSONObject();
 				mediaTDoc.put("headLine", docId);
-				String docText = text;
+				String docText = org.json.simple.JSONObject.escape(text);
 				//					mediaTDoc.put("text", "<p>"+docText.substring(0, 250)+"...</p>");
-				mediaTDoc.put("text", "<p>" + org.json.simple.JSONObject.escape(docText.substring(0, 250)) + "</p>");
+				
+				String partText = (docText.length()>249) ? docText.substring(0, 250) : docText;
+				
+				mediaTDoc.put("text", "<p>" + partText + "</p>");
 
 				JSONObject mediaDDoc = new JSONObject();
 				mediaDDoc.put("day",startdate.substring(8, 10));
@@ -770,14 +773,14 @@ public class EParrotRepositoryService {
 			JSONObject obj = new JSONObject();
 			obj.put("title", titleObject);
 			obj.put("events", eventsArray);
-		    String output = "<div id='timeline-embed' style=\"width: 100%; height: 600px\"></div>";
+		    String output = "<div id='timeline-embed' style=\"height: 450px\"></div>";
 		    output += 
 	        "<script type=\"text/javascript\">\n" + 
-	        "var json = \"" + obj.toString() + "\" \n" + 
+	        "var json = \"" + obj.toString().replaceAll("\"", "\\\\\"") + "\" \n" + 
 	        "var timeline_json = JSON.parse(json);//make_the_json(); // you write this part\n" +
 	        "window.timeline = new TL.Timeline('timeline-embed', timeline_json);\n" + 
-	        "</script>\n" + 
-	        "</div>\n";
+	        "</script>\n";
+//	        "</div>\n";
 
 //			output += "</ul>";
 			return output;
