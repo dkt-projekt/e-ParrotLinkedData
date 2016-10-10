@@ -506,6 +506,26 @@ public class EParrotRepositoryServiceStandAlone extends BaseRestController{
 		}
 	}
 
+	@RequestMapping(value = "/e-parrot/{collection}/update", method = { RequestMethod.POST, RequestMethod.GET })
+	public ResponseEntity<String> updateCollection(
+			HttpServletRequest request, 
+			@PathVariable(value = "collection") String collectionName,
+            @RequestBody(required = false) String postBody) throws Exception {
+		try {
+			String result;
+			if(repositoryService.updateCollection(collectionName, 0)){
+				result = "The collection "+collectionName+" has been successfully updated!!";
+			}
+			else{
+				result = "The collection "+collectionName+" has NOT been updated. The process has failed!!!!";
+			}
+			HttpHeaders responseHeaders = new HttpHeaders();
+			return new ResponseEntity<String>(result, responseHeaders, HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			throw e;
+		}
+	}
 	
 	@RequestMapping(value = "/e-parrot/{collection}/{document}/overview", method = { RequestMethod.POST, RequestMethod.GET })
 	public ResponseEntity<String> getDocumentOverview(
