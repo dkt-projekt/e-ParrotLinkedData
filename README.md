@@ -1,2 +1,2 @@
 # e-ParrotLinkedData
-Ednpoint for the connection of the first user interface.
+Endpoint for the connection of the first user interface.
