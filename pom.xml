@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>de.dkt</groupId>
   <artifactId>e-ParrotLinkedData</artifactId>
-  <version>0.6</version>
+  <version>0.7-SNAPSHOT</version>
   <name>e-ParrotLinkedData</name>
   <description>DKT project</description>
   
@@ -97,7 +97,7 @@
                 <connection>scm:git:git@github.com:dkt-projekt/e-ParrotLinkedData.git</connection>
                 <url>scm:git:git@github.com/dkt-projekt/e-ParrotLinkedData.git</url>
                 <developerConnection>scm:git:git@github.com:dkt-projekt/e-ParrotLinkedData.git</developerConnection>
-                <tag>e-ParrotLinkedData-0.6</tag>
+                <tag>HEAD</tag>
         </scm>
 
 </project>
